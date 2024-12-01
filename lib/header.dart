@@ -14,13 +14,6 @@ class Header extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             decoration: BoxDecoration(
               color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 5,
-                  offset: Offset(0, 2),
-                ),
-              ],
             ),
             child: Column(
               children: [
@@ -29,7 +22,7 @@ class Header extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'LOGO',
+                      'Shopping',
                       style: TextStyle(
                         color: Colors.black,
                         fontSize: 20.0,
