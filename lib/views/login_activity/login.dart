@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../controllers/login/login_controller.dart';
+import '../../controllers/login/login_controller.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -36,11 +36,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   SizedBox(height: 30),
                   Text(
-                    '함께하는 모든 순간 ,',
+                    '쉽고 빠르게',
                     style: TextStyle(color: Colors.black, fontSize: 30, fontWeight: FontWeight.bold),
                   ),
                   Text(
-                    '손 끝에서 시작되는 약속',
+                    '쇼핑하세요',
                     style: TextStyle(color: Colors.black, fontSize: 30, fontWeight: FontWeight.bold),
                   ),
                 ],

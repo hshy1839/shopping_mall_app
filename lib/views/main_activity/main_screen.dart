@@ -1,8 +1,8 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'footer.dart';
-import 'header.dart';
+import '../../footer.dart';
+import '../../header.dart';
 
 class MainScreen extends StatefulWidget {
   @override
@@ -10,7 +10,7 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int selectedIndex = 0;
+
 
   final List<Map<String, String>> categories = [
     {'name': '남성의류', 'icon': 'assets/icons/cloth_man.png'},
@@ -32,11 +32,6 @@ class _MainScreenState extends State<MainScreen> {
   ScrollController _scrollController = ScrollController();
   bool _isHeaderVisible = true;
 
-  void _onTabTapped(int index) {
-    setState(() {
-      selectedIndex = index;
-    });
-  }
 
   @override
   void initState() {
@@ -109,6 +104,58 @@ class _MainScreenState extends State<MainScreen> {
               ),
             ),
           ),
+
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
+              child: Container(
+                padding: const EdgeInsets.all(16.0),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '공지사항',
+                      style: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                    SizedBox(height: 12),
+                    Text(
+                      '이번 주는 특별 할인 주간입니다! 많은 관심 부탁드립니다.',
+                      style: TextStyle(
+                        fontSize: 12.0,
+                        color: Colors.black,
+                      ),
+                    ),
+                    SizedBox(height: 20), // 공지사항과 버튼 간의 간격
+                    Align(
+                      alignment: Alignment.bottomRight,
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/notice');
+                        },
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.grey,
+                          textStyle: TextStyle(
+                            fontSize: 12.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        child: Text('전체보기'),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
 
           // 아이콘과 함께 배치된 카테고리
           SliverToBoxAdapter(
@@ -230,10 +277,7 @@ class _MainScreenState extends State<MainScreen> {
 
         ],
       ),
-      bottomNavigationBar: Footer(
-        selectedIndex: selectedIndex,
-        onTabTapped: _onTabTapped,
-      ),
+
     );
   }
 }
