@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:attedance_app/login_activity/signup.dart';
+import 'package:attedance_app/shopping_screen/shopping_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'login_activity/login.dart'; // 로그인 페이지 주석 처리
@@ -136,11 +137,24 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
         useMaterial3: true,
       ),
-      initialRoute: '/login', // 초기 화면 설정
-      routes: {
-        '/login': (context) => LoginScreen(), // 로그인 페이지
-        '/main': (context) => MainScreen(),
-        '/signup': (context) => SignupScreen(),
+      initialRoute: '/main', // 초기 화면 설정
+      onGenerateRoute: (settings) {
+        if (settings.name == '/shoppingscreen') {
+          final categoryName = settings.arguments as String; // 카테고리 이름을 전달받음
+          return MaterialPageRoute(
+            builder: (context) => ShoppingScreen(categoryName: categoryName),
+          );
+        }
+        switch (settings.name) {
+          case '/login':
+            return MaterialPageRoute(builder: (context) => LoginScreen());
+          case '/main':
+            return MaterialPageRoute(builder: (context) => MainScreen());
+          case '/signup':
+            return MaterialPageRoute(builder: (context) => SignupScreen());
+          default:
+            return null;
+        }
       },
     );
   }

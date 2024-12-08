@@ -111,6 +111,7 @@ class _MainScreenState extends State<MainScreen> {
           ),
 
           // 아이콘과 함께 배치된 카테고리
+          // 수정된 카테고리 위젯
           SliverToBoxAdapter(
             child: Container(
               padding: EdgeInsets.only(top: 30.0, left: 8.0, right: 8.0),
@@ -119,28 +120,38 @@ class _MainScreenState extends State<MainScreen> {
                 spacing: 10.0, // 아이템 간의 간격
                 runSpacing: 16.0, // 행 간의 간격
                 children: categories.map((category) {
-                  return Container(
-                    width: (MediaQuery.of(context).size.width - 40) / 5, // 한 행에 5개 아이템 배치
-                    child: Column(
-                      children: [
-                        Image.asset(
-                          category['icon']!,
-                          width: 25, // 아이콘 크기 조정
-                          height: 25, // 아이콘 크기 조정
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          category['name']!,
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                          textAlign: TextAlign.center, // 텍스트 중앙 정렬
-                        ),
-                      ],
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(
+                        context,
+                        '/shoppingscreen',
+                        arguments: category['name'], // 카테고리 이름 전달
+                      );
+                    },
+                    child: Container(
+                      width: (MediaQuery.of(context).size.width - 40) / 5, // 한 행에 5개 아이템 배치
+                      child: Column(
+                        children: [
+                          Image.asset(
+                            category['icon']!,
+                            width: 25, // 아이콘 크기 조정
+                            height: 25, // 아이콘 크기 조정
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            category['name']!,
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.center, // 텍스트 중앙 정렬
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 }).toList(),
               ),
             ),
           ),
+
 
           // 추천 상품 섹션
           SliverToBoxAdapter(
