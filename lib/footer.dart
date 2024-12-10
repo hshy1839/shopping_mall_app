@@ -21,31 +21,26 @@ class Footer extends StatelessWidget {
             index: 0,
           ),
           // 1:1 문의 탭
-          _buildFooterItem(
-            context,
-            icon: Icons.help_outline,
-            label: '1:1 문의',
-            index: 1,
-          ),
+
           _buildFooterItem(
             context,
             icon: Icons.menu_outlined,
             label: '카테고리',
-            index: 2,
+            index: 1,
           ),
           // 구매내역 탭
           _buildFooterItem(
             context,
             icon: Icons.receipt_long_outlined,
             label: '구매내역',
-            index: 3,
+            index: 2,
           ),
           // 마이페이지 탭
           _buildFooterItem(
             context,
             icon: Icons.person_outline,
             label: '마이페이지',
-            index: 4,
+            index: 3,
           ),
         ],
       ),

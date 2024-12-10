@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
 import '../../views/login_activity/login.dart';
 
 class SignupController extends ChangeNotifier {
@@ -9,24 +8,16 @@ class SignupController extends ChangeNotifier {
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
-  final phoneNumberController = TextEditingController();
-  final companyController = TextEditingController();
-  final positionController = TextEditingController();
-  final teamController = TextEditingController();
+  final phoneController = TextEditingController();
+  final addressController = TextEditingController();
+  final addressDetailController = TextEditingController();
 
-  String? errorMessage;
+  String errorMessage = '';
 
   Future<void> submitData(BuildContext context) async {
     // 비밀번호와 비밀번호 확인 비교
     if (passwordController.text != confirmPasswordController.text) {
       errorMessage = '비밀번호와 비밀번호 확인이 일치하지 않습니다.';
-      notifyListeners();
-      return;
-    }
-
-    // 필수 입력 필드 체크
-    if (companyController.text.isEmpty || positionController.text.isEmpty || teamController.text.isEmpty) {
-      errorMessage = '회사명, 직급, 팀명은 필수 입력 사항입니다.';
       notifyListeners();
       return;
     }
@@ -40,11 +31,10 @@ class SignupController extends ChangeNotifier {
         'name': nameController.text,
         'username': usernameController.text,
         'password': passwordController.text,
-        'phoneNumber': phoneNumberController.text,
+        'phoneNumber': phoneController.text,
         'is_active': false,
-        'company': companyController.text,
-        'position': positionController.text,
-        'team': teamController.text,
+        'address': addressController.text,
+        'address_detail': addressDetailController.text,
       }),
     );
 
@@ -64,17 +54,15 @@ class SignupController extends ChangeNotifier {
     }
   }
 
-
   @override
   void dispose() {
     nameController.dispose();
     usernameController.dispose();
     passwordController.dispose();
     confirmPasswordController.dispose();
-    phoneNumberController.dispose();
-    companyController.dispose();
-    positionController.dispose();
-    teamController.dispose();
+    phoneController.dispose();
+    addressController.dispose();
+    addressDetailController.dispose();
     super.dispose();
   }
 }

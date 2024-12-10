@@ -10,7 +10,13 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  int _selectedIndex = 0;
 
+  void _onTabTapped(int index) {
+    setState(() {
+      _selectedIndex = index; // 탭 변경 시 인덱스를 업데이트
+    });
+  }
 
   final List<Map<String, String>> categories = [
     {'name': '남성의류', 'icon': 'assets/icons/cloth_man.png'},
@@ -288,7 +294,6 @@ class _MainScreenState extends State<MainScreen> {
 
         ],
       ),
-
     );
   }
 }

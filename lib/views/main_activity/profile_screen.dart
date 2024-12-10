@@ -13,7 +13,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final int reviewCount = 2; // 나의 리뷰 개수
   final int inquiryCount = 1; // 문의 개수
 
+  int _selectedIndex = 4; // 마이페이지 탭의 인덱스는 4로 설정
 
+  void _onTabTapped(int index) {
+    setState(() {
+      _selectedIndex = index; // 탭 변경 시 인덱스를 업데이트
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,12 +36,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0.5,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+
       ),
       body: Container(
         color: Colors.white,
@@ -119,7 +120,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
               title: Text('개인정보 수정'),
               trailing: Icon(Icons.arrow_forward_ios, size: 16.0, color: Colors.grey),
               onTap: () {
-                // 공지사항 화면으로 이동
+                // 개인정보 수정 화면으로 이동
+              },
+            ),
+            Divider(color: Colors.grey[300], thickness: 1.0),
+            ListTile(
+              title: Text('고객센터'),
+              trailing: Icon(Icons.arrow_forward_ios, size: 16.0, color: Colors.grey),
+              onTap: () {
+                // 개인정보 수정 화면으로 이동
+              },
+            ),
+            Divider(color: Colors.grey[300], thickness: 1.0),
+            ListTile(
+              title: Text('개인정보처리방침'),
+              trailing: Icon(Icons.arrow_forward_ios, size: 16.0, color: Colors.grey),
+              onTap: () {
+                // 개인정보 수정 화면으로 이동
               },
             ),
             Divider(color: Colors.grey[300], thickness: 1.0),
@@ -127,18 +144,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               title: Text('서비스 이용약관'),
               trailing: Icon(Icons.arrow_forward_ios, size: 16.0, color: Colors.grey),
               onTap: () {
-                // 서비스 이용약관 화면으로 이동
+                // 개인정보 수정 화면으로 이동
               },
             ),
-            Divider(color: Colors.grey[300], thickness: 1.0),
-            ListTile(
-              title: Text('개인정보 처리방침'),
-              trailing: Icon(Icons.arrow_forward_ios, size: 16.0, color: Colors.grey),
-              onTap: () {
-                // 개인정보 처리방침 화면으로 이동
-              },
-            ),
-            Divider(color: Colors.grey[300], thickness: 1.0),
           ],
         ),
       ),
