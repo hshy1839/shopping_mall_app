@@ -65,52 +65,59 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ],
               ),
             ),
-            Divider(color: Colors.grey[300], thickness: 1.0),
-            // 쿠폰, 주문내역, 나의 리뷰, 문의
+            // 쿠폰, 주문내역, 나의 리뷰, 문의 (하나의 사각형으로 묶음)
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _buildStatItem(
-                    context,
-                    title: '쿠폰',
-                    count: couponCount,
-                    onTap: () {
-                      // 쿠폰 화면으로 이동
-                    },
-                  ),
-                  _buildStatItem(
-                    context,
-                    title: '주문내역',
-                    count: orderCount,
-                    onTap: () {
-                      // 주문내역 화면으로 이동
-                    },
-                  ),
-                  _buildStatItem(
-                    context,
-                    title: '나의 리뷰',
-                    count: reviewCount,
-                    onTap: () {
-                      // 나의 리뷰 화면으로 이동
-                    },
-                  ),
-                  _buildStatItem(
-                    context,
-                    title: '문의',
-                    count: inquiryCount,
-                    onTap: () {
-                      // 문의 화면으로 이동
-                    },
-                  ),
-                ],
+              padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+              child: Container(
+                padding: const EdgeInsets.all(16.0),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey[300]!), // 테두리 색상
+                  borderRadius: BorderRadius.circular(12.0), // 둥근 모서리
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildStatItem(
+                      context,
+                      title: '쿠폰',
+                      count: couponCount,
+                      onTap: () {
+                        // 쿠폰 화면으로 이동
+                      },
+                    ),
+                    _buildStatItem(
+                      context,
+                      title: '주문내역',
+                      count: orderCount,
+                      onTap: () {
+                        // 주문내역 화면으로 이동
+                      },
+                    ),
+                    _buildStatItem(
+                      context,
+                      title: '나의 리뷰',
+                      count: reviewCount,
+                      onTap: () {
+                        // 나의 리뷰 화면으로 이동
+                      },
+                    ),
+                    _buildStatItem(
+                      context,
+                      title: '문의',
+                      count: inquiryCount,
+                      onTap: () {
+                        // 문의 화면으로 이동
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
             Divider(color: Colors.grey[300], thickness: 1.0),
             // 공지사항, 약관 및 정책
             ListTile(
               title: Text('공지사항'),
+              leading: Icon(Icons.notifications, color: Colors.grey), // 공지사항 아이콘
               trailing: Icon(Icons.arrow_forward_ios, size: 16.0, color: Colors.grey),
               onTap: () {
                 Navigator.pushNamed(context, '/notice');
@@ -119,6 +126,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Divider(color: Colors.grey[300], thickness: 1.0),
             ListTile(
               title: Text('개인정보 수정'),
+              leading: Icon(Icons.person_outline, color: Colors.grey), // 개인정보 수정 아이콘
               trailing: Icon(Icons.arrow_forward_ios, size: 16.0, color: Colors.grey),
               onTap: () {
                 // 개인정보 수정 화면으로 이동
@@ -127,6 +135,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Divider(color: Colors.grey[300], thickness: 1.0),
             ListTile(
               title: Text('고객센터'),
+              leading: Icon(Icons.call, color: Colors.grey), // 고객센터 아이콘
               trailing: Icon(Icons.arrow_forward_ios, size: 16.0, color: Colors.grey),
               onTap: () {
                 // 고객센터 화면으로 이동
@@ -135,6 +144,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Divider(color: Colors.grey[300], thickness: 1.0),
             ListTile(
               title: Text('개인정보처리방침'),
+              leading: Icon(Icons.security, color: Colors.grey), // 개인정보처리방침 아이콘
               trailing: Icon(Icons.arrow_forward_ios, size: 16.0, color: Colors.grey),
               onTap: () {
                 // 개인정보 처리방침 화면으로 이동
@@ -143,6 +153,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Divider(color: Colors.grey[300], thickness: 1.0),
             ListTile(
               title: Text('서비스 이용약관'),
+              leading: Icon(Icons.description, color: Colors.grey), // 서비스 이용약관 아이콘
               trailing: Icon(Icons.arrow_forward_ios, size: 16.0, color: Colors.grey),
               onTap: () {
                 // 서비스 이용약관 화면으로 이동
@@ -152,7 +163,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ListTile(
               title: Row(
                 children: [
-                  Icon(Icons.logout), // 로그아웃 아이콘 추가
+                  Icon(Icons.logout, color: Colors.grey), // 로그아웃 아이콘 추가
                   SizedBox(width: 10),
                   Text('로그아웃'),
                 ],
