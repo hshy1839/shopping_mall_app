@@ -1,6 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import '../../controllers/notice_screen_controller.dart';
 import '../../footer.dart';
 import '../../header.dart';
 
@@ -11,6 +12,16 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
+  List<Map<String, String>> notices = []; // 공지사항 리스트
+
+  // 공지사항 불러오기
+  Future<void> _loadNotices() async {
+    NoticeScreenController controller = NoticeScreenController();
+    List<Map<String, String>> fetchedNotices = await controller.fetchNotices();
+    setState(() {
+      notices = fetchedNotices;
+    });
+  }
 
   void _onTabTapped(int index) {
     setState(() {
@@ -42,6 +53,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
+    _loadNotices();
     _scrollController.addListener(_scrollListener);
   }
 
@@ -67,6 +79,8 @@ class _MainScreenState extends State<MainScreen> {
       }
     }
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -113,7 +127,7 @@ class _MainScreenState extends State<MainScreen> {
 
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
+              padding: const EdgeInsets.symmetric(vertical: 1.0, horizontal: 16.0),
               child: Container(
                 padding: const EdgeInsets.all(16.0),
                 decoration: BoxDecoration(
@@ -132,14 +146,23 @@ class _MainScreenState extends State<MainScreen> {
                       ),
                     ),
                     SizedBox(height: 12),
-                    Text(
-                      '이번 주는 특별 할인 주간입니다! 많은 관심 부탁드립니다.',
-                      style: TextStyle(
-                        fontSize: 12.0,
-                        color: Colors.black,
+                    if (notices.isNotEmpty)
+                      Text(
+                        notices[0]['title'] ?? '공지사항 제목',
+                        style: TextStyle(
+                          fontSize: 12.0,
+                          color: Colors.black,
+                        ),
+                      )
+                    else
+                      Text(
+                        '공지사항을 불러올 수 없습니다.',
+                        style: TextStyle(
+                          fontSize: 12.0,
+                          color: Colors.black,
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 20), // 공지사항과 버튼 간의 간격
+                    SizedBox(height: 20),
                     Align(
                       alignment: Alignment.bottomRight,
                       child: TextButton(

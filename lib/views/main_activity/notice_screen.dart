@@ -1,23 +1,28 @@
 import 'package:flutter/material.dart';
+import '../../controllers/notice_screen_controller.dart';
+import 'notice_detail_screen.dart';
 
-class NoticeScreen extends StatelessWidget {
-  final List<Map<String, String>> notices = [
-    {
-      'title': '이번 주 특별 할인 이벤트!',
-      'content': '이번 주는 특별 할인 주간입니다! 많은 관심 부탁드립니다.',
-      'date': '2024-12-01',
-    },
-    {
-      'title': '새로운 기능 추가!',
-      'content': '앱에 새로운 운동 기록 기능이 추가되었습니다. 확인해 보세요.',
-      'date': '2024-12-02',
-    },
-    {
-      'title': '시스템 점검 안내',
-      'content': '내일 오전 10시부터 12시까지 시스템 점검이 진행됩니다.',
-      'date': '2024-12-03',
-    },
-  ];
+class NoticeScreen extends StatefulWidget {
+  @override
+  _NoticeScreenState createState() => _NoticeScreenState();
+}
+
+class _NoticeScreenState extends State<NoticeScreen> {
+  List<Map<String, String>> notices = [];
+  final NoticeScreenController _controller = NoticeScreenController();
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchNotices();
+  }
+
+  Future<void> _fetchNotices() async {
+    final fetchedNotices = await _controller.fetchNotices();
+    setState(() {
+      notices = fetchedNotices;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,23 +31,23 @@ class NoticeScreen extends StatelessWidget {
         title: Text(
           '공지사항',
           style: TextStyle(
-            color: Colors.black, // 텍스트 색상 검정
-            fontWeight: FontWeight.bold, // 텍스트 Bold
-            fontSize: 18.0, // 텍스트 크기
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+            fontSize: 18.0,
           ),
         ),
-        centerTitle: true, // 텍스트를 중앙에 배치
-        backgroundColor: Colors.white, // AppBar 배경 흰색
-        elevation: 0.5, // 그림자 효과
+      backgroundColor: Colors.white,
+        centerTitle: true,
+        elevation: 0.5,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black), // 뒤로가기 아이콘
+          icon: Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
-            Navigator.pop(context); // 이전 화면으로 이동
+            Navigator.pop(context);
           },
         ),
       ),
       body: Container(
-        color: Colors.white, // 배경 흰색
+        color: Colors.white,
         child: ListView.builder(
           itemCount: notices.length,
           itemBuilder: (context, index) {
@@ -58,14 +63,23 @@ class NoticeScreen extends StatelessWidget {
                     ),
                   ),
                   subtitle: Text(
-                    notices[index]['date']!,
+                    notices[index]['created_at']!,
                     style: TextStyle(
                       fontSize: 12.0,
                       color: Colors.grey,
                     ),
                   ),
                   onTap: () {
-                    // 공지 클릭 시 동작
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => NoticeDetailScreen(
+                          title: notices[index]['title']!,
+                          date: notices[index]['created_at']!,
+                          content: notices[index]['content']!,
+                        ),
+                      ),
+                    );
                   },
                 ),
                 Divider(

@@ -6,7 +6,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class MainScreenController extends ChangeNotifier {
   int selectedIndex = 0; // 현재 선택된 탭 인덱스
-  final String targetIp = "192.168.25.31"; // 비교할 대상 IP
   List<String> titles = []; // 공지 제목을 저장할 리스트
   List<String> contents = []; // 공지 내용을 저장할 리스트
   List<String> authorNames = []; // 작성자 이름을 저장할 리스트

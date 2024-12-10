@@ -14,8 +14,16 @@ class NoticeDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('공지사항'),
+        title: Text(
+          title,
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+            fontSize: 18.0,
+          ),
+        ), // 앱바 타이틀을 전달받은 title로 설정
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
@@ -34,7 +42,7 @@ class NoticeDetailScreen extends StatelessWidget {
             Text(
               title,
               style: TextStyle(
-                fontSize: 22,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
               ),
@@ -44,9 +52,15 @@ class NoticeDetailScreen extends StatelessWidget {
             Text(
               date,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 12,
                 color: Colors.grey[600],
               ),
+            ),
+            SizedBox(height: 10),
+            // 밑줄 추가
+            Container(
+              height: 1,
+              color: Colors.grey[300],
             ),
             SizedBox(height: 16),
             // 공지 내용
