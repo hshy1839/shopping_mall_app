@@ -22,13 +22,15 @@ class LoginController {
 
       final loginSuccess = responseData['loginSuccess'] ?? false;
       final token = responseData['token'] ?? '';
+      final isActive = responseData['is_active'] ?? false; // 추가: is_active 값 확인
 
       if (loginSuccess) {
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('token', token);
-        await prefs.setBool('isLoggedIn', true);
+          // 로그인 성공 후 token 저장
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('token', token);
+          await prefs.setBool('isLoggedIn', true);
 
-        _showSuccessDialog();
+          _showSuccessDialog();
       } else {
         _showErrorDialog(responseData['message'] ?? 'Error: 500');
       }

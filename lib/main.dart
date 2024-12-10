@@ -1,14 +1,16 @@
-import 'package:attedance_app/shopping_screen/shopping_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/services.dart';
+
+// 화면들 import
 import 'package:attedance_app/views/login_activity/login.dart';
 import 'package:attedance_app/views/login_activity/signup.dart';
 import 'package:attedance_app/views/main_activity/category_screen.dart';
 import 'package:attedance_app/views/main_activity/main_screen.dart';
 import 'package:attedance_app/views/main_activity/notice_screen.dart';
 import 'package:attedance_app/views/main_activity/profile_screen.dart';
-import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'footer.dart';
-import 'package:flutter/services.dart';
+import 'package:attedance_app/shopping_screen/shopping_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,15 +26,15 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
+      home: _determineInitialScreen(), // 초기 화면을 결정합니다.
       onGenerateRoute: (settings) => _generateRoute(settings),
-      initialRoute: '/', // 기본 초기 경로
     );
   }
 
   Route<dynamic> _generateRoute(RouteSettings settings) {
     switch (settings.name) {
       case '/':
-        return MaterialPageRoute(builder: (_) => _determineInitialScreen());
+        return MaterialPageRoute(builder: (_) => MainScreen());
       case '/login':
         return MaterialPageRoute(builder: (_) => LoginScreen());
       case '/signup':
@@ -57,7 +59,12 @@ class MyApp extends StatelessWidget {
         } else if (snapshot.hasError) {
           return Center(child: Text('Error occurred'));
         } else {
-          return snapshot.data!; // 로그인 상태에 맞는 화면 반환
+          // 로그인 상태에 맞는 화면 반환
+          if (snapshot.data is LoginScreen) {
+            return LoginScreen(); // 로그인 화면 반환
+          } else {
+            return MainScreenWithFooter(); // 로그인 후 메인 화면
+          }
         }
       },
     );
@@ -66,11 +73,13 @@ class MyApp extends StatelessWidget {
   Future<Widget> _checkLoginStatus() async {
     final prefs = await SharedPreferences.getInstance();
     final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
-    if (isLoggedIn) {
-      return MainScreenWithFooter(); // 로그인 시 메인 화면
-    } else {
-      return LoginScreen(); // 로그인 안 된 경우 로그인 화면
+    final token = prefs.getString('token'); // 토큰을 확인
+
+    // 로그인 안 된 경우 로그인 화면
+    if (!isLoggedIn || token == null) {
+      return LoginScreen();
     }
+    return MainScreenWithFooter(); // 로그인 후 메인 화면
   }
 }
 
@@ -87,7 +96,7 @@ class _MainScreenWithFooterState extends State<MainScreenWithFooter> {
   final List<Widget> _pages = [
     MainScreen(),
     CategoryScreen(),
-    LoginScreen(),
+    LoginScreen(), // 로그인 화면을 추가하여 리디렉션 처리
     ProfileScreen(),
   ];
 

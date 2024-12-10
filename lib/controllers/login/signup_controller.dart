@@ -15,6 +15,22 @@ class SignupController extends ChangeNotifier {
   String errorMessage = '';
 
   Future<void> submitData(BuildContext context) async {
+
+    if (nameController.text.isEmpty ||
+        usernameController.text.isEmpty ||
+        passwordController.text.isEmpty ||
+        confirmPasswordController.text.isEmpty ||
+        phoneController.text.isEmpty ||
+        addressController.text.isEmpty ||
+        addressDetailController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('칸을 모두 채워주세요'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
     // 비밀번호와 비밀번호 확인 비교
     if (passwordController.text != confirmPasswordController.text) {
       errorMessage = '비밀번호와 비밀번호 확인이 일치하지 않습니다.';

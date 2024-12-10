@@ -36,6 +36,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   SizedBox(height: 30),
                   Text(
+                    'Shopping',
+                    style: TextStyle(color: Colors.black, fontSize: 50, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 30),
+                  Text(
                     '쉽고 빠르게',
                     style: TextStyle(color: Colors.black, fontSize: 30, fontWeight: FontWeight.bold),
                   ),
@@ -76,10 +81,19 @@ class _LoginScreenState extends State<LoginScreen> {
                   loginController.login(username, password);
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF25c387),
+                  backgroundColor: Colors.black,
                   minimumSize: Size(double.infinity, 56),
+                ).copyWith(
+                  shape: MaterialStateProperty.all(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.zero,  // 사각형으로 만들기 위해 radius를 0으로 설정
+                    ),
+                  ),
                 ),
-                child: Text('로그인', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900)),
+                child: Text(
+                  '로그인',
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900),
+                ),
               ),
               SizedBox(height: 10),
               ElevatedButton(
@@ -87,11 +101,24 @@ class _LoginScreenState extends State<LoginScreen> {
                   Navigator.pushNamed(context, '/signup');
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blueAccent,
+                  backgroundColor: Colors.blueAccent,  // 배경색을 흰색으로 설정
                   minimumSize: Size(double.infinity, 56),
+                ).copyWith(
+                  shape: MaterialStateProperty.all(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.zero,  // 사각형 모양으로 설정
+                    ),
+                  ),
                 ),
-                child: Text('회원가입', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900)),
+                child: Text(
+                  '회원가입',
+                  style: TextStyle(
+                    color: Colors.white,  // 텍스트 색을 검은색으로 설정
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
               ),
+
             ],
           ),
         ),

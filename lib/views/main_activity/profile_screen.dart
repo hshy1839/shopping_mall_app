@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../controllers/profile_screen_controller.dart';
 import '../../footer.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -7,6 +8,7 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  final ProfileScreenController _controller = ProfileScreenController(); // 컨트롤러 인스턴스
   final String username = "회원님"; // 사용자 이름
   final int couponCount = 3; // 쿠폰 개수
   final int orderCount = 5; // 주문내역 개수
@@ -36,7 +38,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0.5,
-
       ),
       body: Container(
         color: Colors.white,
@@ -128,7 +129,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               title: Text('고객센터'),
               trailing: Icon(Icons.arrow_forward_ios, size: 16.0, color: Colors.grey),
               onTap: () {
-                // 개인정보 수정 화면으로 이동
+                // 고객센터 화면으로 이동
               },
             ),
             Divider(color: Colors.grey[300], thickness: 1.0),
@@ -136,7 +137,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               title: Text('개인정보처리방침'),
               trailing: Icon(Icons.arrow_forward_ios, size: 16.0, color: Colors.grey),
               onTap: () {
-                // 개인정보 수정 화면으로 이동
+                // 개인정보 처리방침 화면으로 이동
               },
             ),
             Divider(color: Colors.grey[300], thickness: 1.0),
@@ -144,13 +145,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
               title: Text('서비스 이용약관'),
               trailing: Icon(Icons.arrow_forward_ios, size: 16.0, color: Colors.grey),
               onTap: () {
-                // 개인정보 수정 화면으로 이동
+                // 서비스 이용약관 화면으로 이동
               },
+            ),
+            Divider(color: Colors.grey[300], thickness: 1.0),
+            ListTile(
+              title: Row(
+                children: [
+                  Icon(Icons.logout), // 로그아웃 아이콘 추가
+                  SizedBox(width: 10),
+                  Text('로그아웃'),
+                ],
+              ),
+              trailing: Icon(Icons.arrow_forward_ios, size: 16.0, color: Colors.grey),
+              onTap: () => _controller.logout(context), // 로그아웃 실행
             ),
           ],
         ),
       ),
-
     );
   }
 

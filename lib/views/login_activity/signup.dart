@@ -179,11 +179,22 @@ class SignUpScreen extends StatelessWidget {
                       onPressed: () {
                         controller.submitData(context);
                       },
-                      child: Text('회원가입'),
+                      child: Text(
+                        '회원가입',
+                        style: TextStyle(color: Colors.white),  // 텍스트 색을 흰색으로 설정
+                      ),
                       style: ElevatedButton.styleFrom(
-                        minimumSize: Size(double.infinity, 50),
+                        backgroundColor: Colors.black,  // 배경색을 검은색으로 설정
+                        minimumSize: Size(double.infinity, 70),  // 버튼 크기 설정
+                      ).copyWith(
+                        shape: MaterialStateProperty.all(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.zero,  // 사각형 모양으로 설정
+                          ),
+                        ),
                       ),
                     );
+
                   },
                 ),
                 SizedBox(height: 16),
@@ -199,7 +210,7 @@ class SignUpScreen extends StatelessWidget {
                           MaterialPageRoute(builder: (context) => LoginScreen()),
                         );
                       },
-                      child: Text('이미 계정이 있으신가요? 로그인'),
+                      child: Text('이미 계정이 있으신가요? 로그인',  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.blueAccent, )),
                     ),
                   ],
                 ),
