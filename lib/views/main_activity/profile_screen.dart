@@ -46,18 +46,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
             // 회원 이름 섹션
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
-              child: Row(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start, // 텍스트 왼쪽 정렬
                 children: [
-                  CircleAvatar(
-                    radius: 30.0,
-                    backgroundColor: Colors.grey[300],
-                    child: Icon(Icons.person, color: Colors.white, size: 30.0),
+                  Text(
+                    '안녕하세요,',
+                    style: TextStyle(
+                      fontSize: 24.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
                   ),
-                  SizedBox(width: 16.0),
+                  SizedBox(height: 5.0),
                   Text(
                     '$username',
                     style: TextStyle(
-                      fontSize: 20.0,
+                      fontSize: 24.0,
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
                     ),
@@ -65,6 +69,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ],
               ),
             ),
+            SizedBox(height: 10.0),
             // 쿠폰, 주문내역, 나의 리뷰, 문의 (하나의 사각형으로 묶음)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
@@ -113,10 +118,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
             ),
+            SizedBox(height: 20.0),
             Divider(color: Colors.grey[300], thickness: 1.0),
+
             // 공지사항, 약관 및 정책
             ListTile(
-              title: Text('공지사항'),
+              title: Text('공지사항', style: TextStyle( fontWeight: FontWeight.bold, color: Colors.black),),
               leading: Icon(Icons.notifications, color: Colors.grey), // 공지사항 아이콘
               trailing: Icon(Icons.arrow_forward_ios, size: 16.0, color: Colors.grey),
               onTap: () {
@@ -125,7 +132,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             Divider(color: Colors.grey[300], thickness: 1.0),
             ListTile(
-              title: Text('개인정보 수정'),
+              title: Text('개인정보 수정', style: TextStyle( fontWeight: FontWeight.bold, color: Colors.black),),
               leading: Icon(Icons.person_outline, color: Colors.grey), // 개인정보 수정 아이콘
               trailing: Icon(Icons.arrow_forward_ios, size: 16.0, color: Colors.grey),
               onTap: () {
@@ -134,7 +141,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             Divider(color: Colors.grey[300], thickness: 1.0),
             ListTile(
-              title: Text('고객센터'),
+              title: Text('고객센터', style: TextStyle( fontWeight: FontWeight.bold, color: Colors.black),),
               leading: Icon(Icons.call, color: Colors.grey), // 고객센터 아이콘
               trailing: Icon(Icons.arrow_forward_ios, size: 16.0, color: Colors.grey),
               onTap: () {
@@ -143,7 +150,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             Divider(color: Colors.grey[300], thickness: 1.0),
             ListTile(
-              title: Text('개인정보처리방침'),
+              title: Text('개인정보처리방침', style: TextStyle( fontWeight: FontWeight.bold, color: Colors.black),),
               leading: Icon(Icons.security, color: Colors.grey), // 개인정보처리방침 아이콘
               trailing: Icon(Icons.arrow_forward_ios, size: 16.0, color: Colors.grey),
               onTap: () {
@@ -152,7 +159,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             Divider(color: Colors.grey[300], thickness: 1.0),
             ListTile(
-              title: Text('서비스 이용약관'),
+              title: Text('서비스 이용약관', style: TextStyle( fontWeight: FontWeight.bold, color: Colors.black),),
               leading: Icon(Icons.description, color: Colors.grey), // 서비스 이용약관 아이콘
               trailing: Icon(Icons.arrow_forward_ios, size: 16.0, color: Colors.grey),
               onTap: () {
@@ -165,7 +172,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 children: [
                   Icon(Icons.logout, color: Colors.grey), // 로그아웃 아이콘 추가
                   SizedBox(width: 10),
-                  Text('로그아웃'),
+                  Text('로그아웃', style: TextStyle( fontWeight: FontWeight.bold, color: Colors.black),),
                 ],
               ),
               trailing: Icon(Icons.arrow_forward_ios, size: 16.0, color: Colors.grey),

@@ -1,9 +1,12 @@
+import 'package:attedance_app/controllers/product_controller.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import '../../controllers/notice_screen_controller.dart';
 import '../../footer.dart';
 import '../../header.dart';
+import '../product_activity/product_detail_screen.dart';
 
 class MainScreen extends StatefulWidget {
   @override
@@ -13,6 +16,7 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
   List<Map<String, String>> notices = []; // 공지사항 리스트
+  List<Map<String, String>> products = [];
 
   // 공지사항 불러오기
   Future<void> _loadNotices() async {
@@ -22,6 +26,21 @@ class _MainScreenState extends State<MainScreen> {
       notices = fetchedNotices;
     });
   }
+
+  // 상품 불러오기
+  Future<void> _loadProducts() async {
+    try {
+      ProductController controller = ProductController();
+      List<Map<String, String>> fetchedProducts = await controller.fetchProducts();
+      setState(() {
+        products = fetchedProducts;
+      });
+    } catch (e) {
+      // 데이터를 불러오지 못했을 때 콘솔에 오류 메시지 출력
+      print('Error loading products: $e');
+    }
+  }
+
 
   void _onTabTapped(int index) {
     setState(() {
@@ -54,6 +73,7 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
     _loadNotices();
+    _loadProducts();
     _scrollController.addListener(_scrollListener);
   }
 
@@ -256,64 +276,103 @@ class _MainScreenState extends State<MainScreen> {
 
 
           SliverPadding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0), // 전체 상품 목록에 좌우 여백 추가
-          sliver:SliverGrid(
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 0, // 상품 간의 가로 간격 제거
-              mainAxisSpacing: 0, // 상품 간의 세로 간격 제거
-              childAspectRatio: 0.75,
-            ),
-            delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 0.0), // 상품 간의 간격 없이 padding 추가
-                  child: Card(
-                    color: Colors.white,
-                    elevation: 0,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: ClipRRect(
-                            child: Image.asset(
-                              'assets/images/nike1.png', // 상품 이미지
-                              fit: BoxFit.cover,
-                              width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            sliver: SliverGrid(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 0,
+                mainAxisSpacing: 0,
+                childAspectRatio: 0.75,
+              ),
+              delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                  final product = products[index];
+
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 0.0),
+                    child: GestureDetector(
+                      onTap: () {
+                        // 상품 상세 화면으로 이동, productId와 product를 넘김
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ProductDetailScreen(
+                              product: product,
+                              productId: product['id'] ?? '',  // productId 전달
                             ),
                           ),
+                        );
+                      },
+                      child: Card(
+                        color: Colors.white,
+                        elevation: 0,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(8.0),
+                                child: Image.network(
+                                  product['mainImageUrl'] ?? 'assets/images/nike1.png',
+                                  fit: BoxFit.cover,
+                                  height: 200,
+                                  width: double.infinity,
+                                  loadingBuilder: (context, child, loadingProgress) {
+                                    if (loadingProgress == null) {
+                                      return child;
+                                    }
+                                    return Center(child: CircularProgressIndicator());
+                                  },
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Center(child: Icon(Icons.error));
+                                  },
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 4.0),
+                              child: Text(
+                                '₩ ${product['price'] ?? '상품 가격'}',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                  fontSize: 18,
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 4.0),
+                              child: Text(
+                                product['category'] ?? '카테고리',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 0.0),
+                              child: Text(
+                                product['name'] ?? '상품 제목',
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 0.0),
-                          child: Text(
-                            '20,000', // 상품명
-                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 18),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 0.0),
-                          child: Text(
-                            '나이키', // 상품 가격
-                            style: TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 0.0),
-                          child: Text(
-                            '상품명', // 상품 가격
-                            style: TextStyle(color: Colors.grey, fontSize: 10),
-                          ),
-                        ),
-                        SizedBox(height: 8),
-                      ],
+                      ),
                     ),
-                  ),
-                );
-              },
-              childCount: 8, // 상품 개수
+                  );
+                },
+                childCount: products.length,
+              ),
             ),
-          ),
-          ),
+          )
+
 
         ],
       ),

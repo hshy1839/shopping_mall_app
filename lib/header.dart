@@ -22,7 +22,7 @@ class Header extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Shopping',
+                      'Alice',
                       style: TextStyle(
                         color: Colors.black,
                         fontSize: 20.0,

@@ -13,7 +13,8 @@ dependencies:
     sdk: flutter
   shared_preferences: ^2.3.3
   footer: ^0.0.4
-  http: ^0.13.6
+  cached_network_image: ^3.4.1
+  http: ^1.2.2
   network_info_plus: ^6.1.1
   provider: ^6.1.2
   intl: ^0.18.0
