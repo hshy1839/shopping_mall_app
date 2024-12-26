@@ -25,13 +25,11 @@ class ProductController {
       );
 
       // 응답 데이터 출력
-      print('API 응답: ${response.body}');
 
       if (response.statusCode == 200) {
         final decodedResponse = json.decode(response.body);
 
         // 디코드된 데이터 출력
-        print('디코드된 응답: $decodedResponse');
 
         if (decodedResponse is Map<String, dynamic> && decodedResponse['products'] is List<dynamic>) {
           final List<dynamic> data = decodedResponse['products'];

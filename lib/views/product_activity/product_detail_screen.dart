@@ -1,8 +1,15 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../controllers/cart_controller.dart';
+import '../../controllers/profile_screen_controller.dart';
 
 class ProductDetailScreen extends StatelessWidget {
   final Map<String, dynamic> product; // 상품 데이터를 받을 필드 추가
   final String productId;
+  String userId = '';
 
   ProductDetailScreen({required this.product, required this.productId}); // 생성자
 
@@ -204,6 +211,27 @@ class ProductOptionsBottomSheet extends StatefulWidget {
 
 class _ProductOptionsBottomSheetState extends State<ProductOptionsBottomSheet> {
   Map<String, int> sizeQuantity = {}; // 각 사이즈별 수량 관리
+  String userId = ''; // 사용자 ID
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      fetchUserIdAndUpdate(context); // 초기화시 userId 가져오기
+    });
+  }
+
+  Future<void> fetchUserIdAndUpdate(BuildContext context) async {
+
+    // ProfileScreenController의 fetchUserId 호출 후 userId 업데이트
+    ProfileScreenController profileController = ProfileScreenController();
+    await profileController.fetchUserId(context); // BuildContext를 전달
+
+    // fetchUserId가 완료된 후 상태 업데이트
+    setState(() {
+      userId = profileController.userId; // profileController에서 얻은 userId를 현재 페이지의 userId에 저장
+    });
+  }
 
   int get totalAmount {
     int sum = 0;
@@ -382,8 +410,62 @@ class _ProductOptionsBottomSheetState extends State<ProductOptionsBottomSheet> {
                   // 장바구니 버튼
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () {
-                        // 장바구니 추가 로직
+                      onPressed: () async {
+                        // sizeQuantity가 null인지 체크
+                        if (sizeQuantity == null || sizeQuantity.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('상품의 사이즈와 수량을 선택해 주세요.')),
+                          );
+                          return;
+                        }
+
+                        int totalQuantity = 0;
+                        List<Map<String, dynamic>> cartItems = [];
+
+                        sizeQuantity.forEach((size, quantity) {
+                          totalQuantity += quantity; // 전체 사이즈의 수량 합산
+
+                          // 각 사이즈와 수량에 대해 장바구니 아이템 준비
+                          cartItems.add({
+                            'size': size ?? '', // null일 경우 기본값으로 빈 문자열
+                            'quantity': quantity ?? 0, // quantity가 null일 경우 0으로 처리
+                          });
+                        });
+
+                        // userId가 null인 경우 처리
+                        if (userId == null || userId.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('사용자 ID가 유효하지 않습니다.')),
+                          );
+                          return;
+                        }
+
+                        try {
+                          // 각 사이즈와 수량을 포함한 전체 장바구니 아이템을 서버로 전송
+                          final response = await CartController.addToCart(
+                            userId: userId ?? '', // null일 경우 기본값으로 빈 문자열
+                            productId: widget.product['_id'] ?? '', // null일 경우 빈 문자열
+                            productName: widget.product['name'] ?? '', // null일 경우 빈 문자열
+                            sizes: cartItems, // 사이즈와 수량 정보를 포함한 리스트
+                            price: int.parse(widget.product['price'].toString()) ?? 0, // 가격
+                          );
+
+                          // 응답 코드가 200일 경우 성공 메시지, 아니면 실패 메시지
+                          if (response.statusCode == 200) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('장바구니에 상품이 추가되었습니다.')),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('장바구니 추가에 실패했습니다. 다시 시도해 주세요.')),
+                            );
+                          }
+                        } catch (e) {
+                          // 예외 처리 (서버 연결 실패 등)
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('서버와의 연결에 실패했습니다.')),
+                          );
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
@@ -398,6 +480,7 @@ class _ProductOptionsBottomSheetState extends State<ProductOptionsBottomSheet> {
                       ),
                     ),
                   ),
+
                   SizedBox(width: 8),
                   // 구매하기 버튼
                   Expanded(
