@@ -6,6 +6,7 @@ class ProductDetailScreen extends StatelessWidget {
 
   ProductDetailScreen({required this.product, required this.productId}); // 생성자
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -18,7 +19,7 @@ class ProductDetailScreen extends StatelessWidget {
             Navigator.pop(context);
           },
         ),
-        title: Text('상품정보'),
+        title: Text('상품정보', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
         actions: [
           TextButton(
             onPressed: () {},
@@ -45,8 +46,7 @@ class ProductDetailScreen extends StatelessWidget {
                         product['mainImageUrl'] ?? '',
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
-                          // 이미지 로드 실패 시 대체 이미지 표시
-                          return Image.asset('assets/images/placeholder.png');  // 대체 이미지 경로
+                          return Image.asset('assets/images/placeholder.png'); // 대체 이미지
                         },
                       );
                     },
@@ -89,32 +89,36 @@ class ProductDetailScreen extends StatelessWidget {
 
                 Divider(),
 
-
-                if (product['additionalImageUrls'] != null && product['additionalImageUrls'].isNotEmpty)
+                // 추가 이미지
+                if (product['additionalImageUrls'] != null &&
+                    product['additionalImageUrls'].isNotEmpty)
                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16),
+                    padding:
+                    const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           '추가 이미지',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 18),
                         ),
-                        SizedBox(height: 8),
-                        // 추가 이미지들을 수직으로 나열
+                        SizedBox(height: 15),
                         Column(
                           children: List.generate(
-                            product['additionalImageUrls'].split(',').length, // ','로 구분된 URL의 개수만큼 반복
+                            product['additionalImageUrls']
+                                .split(',')
+                                .length, // ','로 구분된 URL의 개수만큼 반복
                                 (index) {
-                              final imageUrl = product['additionalImageUrls'].split(',')[index]; // 각 URL 가져오기
+                              final imageUrl =
+                              product['additionalImageUrls'].split(',')[index];
                               return Padding(
                                 padding: const EdgeInsets.only(bottom: 8.0),
                                 child: Image.network(
                                   imageUrl,
                                   fit: BoxFit.fill,
                                   errorBuilder: (context, error, stackTrace) {
-                                    print("이미지 로드 실패: $error");
-                                    return Image.asset('assets/images/placeholder.png');  // 대체 이미지
+                                    return Image.asset('assets/images/placeholder.png'); // 대체 이미지
                                   },
                                 ),
                               );
@@ -124,52 +128,68 @@ class ProductDetailScreen extends StatelessWidget {
                       ],
                     ),
                   ),
+                Divider(),
 
+                // 상품 설명
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '상품 설명',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        product['description'] ?? '상품 설명이 없습니다.', // 상품 설명
+                        style: TextStyle(
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
-
-          // 고정된 구매하기 버튼
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              color: Colors.white,
-              padding: const EdgeInsets.all(30.0),
-              child: SizedBox(
-                width: double.infinity, // 버튼을 화면의 가로 너비에 맞게 확장
-                child: ElevatedButton(
-                  onPressed: () {
-                    // 구매하기 버튼 클릭 시 하단에서 옵션 선택 모달 띄우기
-                    showModalBottomSheet(
-                      context: context,
-                      builder: (context) {
-                        return ProductOptionsBottomSheet(product: product); // Pass product data here
-                      },
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: Text(
-                    '구매하기',
-                    style: TextStyle(fontSize: 16, color: Colors.white),
-                  ),
-                ),
+        ],
+      ),
+      bottomNavigationBar: Container(
+        color: Colors.white,
+        padding: const EdgeInsets.all(20.0),
+        child: SizedBox(
+          width: double.infinity, // 버튼을 화면의 가로 너비에 맞게 확장
+          child: ElevatedButton(
+            onPressed: () {
+              // 구매하기 버튼 클릭 시 하단에서 옵션 선택 모달 띄우기
+              showModalBottomSheet(
+                context: context,
+                builder: (context) {
+                  return ProductOptionsBottomSheet(product: product); // Pass product data here
+                },
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.black,
+              padding: EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
               ),
             ),
-          )
-        ],
+            child: Text(
+              '구매하기',
+              style: TextStyle(fontSize: 16, color: Colors.white),
+            ),
+          ),
+        ),
       ),
     );
   }
 }
-
 
 // 옵션을 표시하는 하단 모달 시트
 class ProductOptionsBottomSheet extends StatefulWidget {
@@ -207,6 +227,7 @@ class _ProductOptionsBottomSheetState extends State<ProductOptionsBottomSheet> {
               '사이즈 선택',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
             ),
+            SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
@@ -264,7 +285,7 @@ class _ProductOptionsBottomSheetState extends State<ProductOptionsBottomSheet> {
                 ),
               ],
             ),
-            SizedBox(height: 16),
+            SizedBox(height: 12),
 
             // 선택된 사이즈 정보 표시
             if (sizeQuantity.isNotEmpty)
@@ -274,17 +295,18 @@ class _ProductOptionsBottomSheetState extends State<ProductOptionsBottomSheet> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: sizeQuantity.keys.map((size) {
                       return Padding(
-                        padding: const EdgeInsets.only(top: 16.0),
+                        padding: const EdgeInsets.only(top: 10.0),
                         child: Container(
                           decoration: BoxDecoration(
                             color: Colors.white,
                             border: Border.all(color: Colors.grey.shade200, width: 1),
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          padding: const EdgeInsets.all(16),
+                          padding: const EdgeInsets.all(5),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
@@ -302,6 +324,9 @@ class _ProductOptionsBottomSheetState extends State<ProductOptionsBottomSheet> {
                                   ),
                                 ],
                               ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
                               Text('사이즈: $size'),
                               Row(
                                 children: [
@@ -327,6 +352,8 @@ class _ProductOptionsBottomSheetState extends State<ProductOptionsBottomSheet> {
                                   ),
                                 ],
                               ),
+                            ],
+                          ),
                               Text('가격: ₩ ${int.parse(widget.product['price'].toString()) * sizeQuantity[size]!}'),
                             ],
                           ),
@@ -340,10 +367,10 @@ class _ProductOptionsBottomSheetState extends State<ProductOptionsBottomSheet> {
             // 총액 표시
             if (sizeQuantity.isNotEmpty)
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 15.0),
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: Text(
-                  '총액 ₩ $totalAmount',
-                  style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 20),
+                  '총 금액 ₩ $totalAmount',
+                  style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 15),
                 ),
               ),
 

@@ -28,7 +28,7 @@ class StatusController  extends  ChangeNotifier {
     final attendanceStatus = '출근 완료';
 
     // POST 요청을 보낼 URL
-    final url = 'http://172.30.50.231:8863/api/users/checkIn';
+    final url = 'http://192.168.25.45:8863/api/users/checkIn';
 
     // 헤더 설정
     final headers = {
@@ -96,7 +96,7 @@ class StatusController  extends  ChangeNotifier {
     final attendanceStatus = '퇴근 완료';
 
     // PUT 요청을 보낼 URL
-    final url = 'http://172.30.50.231:8863/api/users/checkOut';
+    final url = 'http://192.168.25.45:8863/api/users/checkOut';
 
     // 헤더 설정
     final headers = {
@@ -152,7 +152,7 @@ class StatusController  extends  ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
 
-    final url = 'http://172.30.50.231:8863/api/users/attendanceInfo';
+    final url = 'http://192.168.25.45:8863/api/users/attendanceInfo';
     final headers = {
       'Content-Type': 'application/json',
       if (token != null) 'Authorization': 'Bearer $token',
