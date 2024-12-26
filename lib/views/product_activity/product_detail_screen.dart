@@ -176,7 +176,7 @@ class ProductDetailScreen extends StatelessWidget {
               showModalBottomSheet(
                 context: context,
                 builder: (context) {
-                  return ProductOptionsBottomSheet(product: product); // Pass product data here
+                  return ProductOptionsBottomSheet(product: product, productId: productId,); // Pass product data here
                 },
               );
             },
@@ -201,8 +201,9 @@ class ProductDetailScreen extends StatelessWidget {
 // 옵션을 표시하는 하단 모달 시트
 class ProductOptionsBottomSheet extends StatefulWidget {
   final Map<String, dynamic> product;
+  final String productId;
 
-  ProductOptionsBottomSheet({required this.product});
+  ProductOptionsBottomSheet({required this.product, required this.productId});
 
   @override
   _ProductOptionsBottomSheetState createState() =>
@@ -212,6 +213,7 @@ class ProductOptionsBottomSheet extends StatefulWidget {
 class _ProductOptionsBottomSheetState extends State<ProductOptionsBottomSheet> {
   Map<String, int> sizeQuantity = {}; // 각 사이즈별 수량 관리
   String userId = ''; // 사용자 ID
+
 
   @override
   void initState() {
@@ -243,6 +245,7 @@ class _ProductOptionsBottomSheetState extends State<ProductOptionsBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    String productId = widget.productId;
     return Scaffold(
       backgroundColor: Colors.white,
       body: Padding(
@@ -439,12 +442,11 @@ class _ProductOptionsBottomSheetState extends State<ProductOptionsBottomSheet> {
                           );
                           return;
                         }
-
                         try {
                           // 각 사이즈와 수량을 포함한 전체 장바구니 아이템을 서버로 전송
                           final response = await CartController.addToCart(
                             userId: userId ?? '', // null일 경우 기본값으로 빈 문자열
-                            productId: widget.product['_id'] ?? '', // null일 경우 빈 문자열
+                            productId: productId ?? '', // null일 경우 빈 문자열
                             productName: widget.product['name'] ?? '', // null일 경우 빈 문자열
                             sizes: cartItems, // 사이즈와 수량 정보를 포함한 리스트
                             price: int.parse(widget.product['price'].toString()) ?? 0, // 가격

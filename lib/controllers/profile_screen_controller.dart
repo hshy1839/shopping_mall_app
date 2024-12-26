@@ -17,7 +17,6 @@ class ProfileScreenController extends ChangeNotifier {
         throw Exception('토큰이 없습니다.');
       }
 
-      print('토큰: $token');  // 토큰 출력 (디버깅용)
 
       // 서버에서 사용자 정보를 가져옵니다.
       final response = await http.get(
@@ -27,11 +26,9 @@ class ProfileScreenController extends ChangeNotifier {
         },
       );
 
-      print('응답 본문: ${response.body}');  // 서버 응답 출력 (디버깅용)
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        print('응답 데이터: $data');  // 응답 데이터 구조 출력 (디버깅용)
 
         // 응답에서 user 객체 내부의 _id에 접근
         if (data['user'] != null && data['user']['_id'] != null) {
