@@ -89,4 +89,28 @@ class CartController {
       rethrow;  // 오류가 발생하면 다시 던짐
     }
   }
+
+  static Future<void> deleteCartItem(String cartId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token') ?? '';
+      // DELETE 요청을 보내기 위한 headers 설정
+      final response = await http.delete(
+        Uri.parse('http://192.168.25.27:8863/api/cart/delete/$cartId'),
+        headers: {
+          'Authorization': 'Bearer $token', // JWT 토큰을 헤더에 추가
+        },
+      );
+
+      // 요청이 성공했는지 확인
+      if (response.statusCode == 200) {
+        print('장바구니에서 상품이 삭제되었습니다.');
+      } else {
+        print('장바구니 삭제 실패: ${response.body}');
+      }
+    } catch (e) {
+      print('오류 발생: $e');
+      rethrow;  // 오류가 발생하면 다시 던짐
+    }
+  }
 }

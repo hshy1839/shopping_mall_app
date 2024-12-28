@@ -23,8 +23,6 @@ class _CartDetailScreenState extends State<CartDetailScreen> {
     _loadCartData();
   }
 
-
-
   // 장바구니 데이터 로드
   Future<void> _loadCartData() async {
     try {
@@ -71,12 +69,74 @@ class _CartDetailScreenState extends State<CartDetailScreen> {
     });
   }
 
-  void _deleteSelectedItems() {
-    setState(() {
-      cartItems.removeWhere((item) => item['isSelected'] == true);
-      totalPrice = getTotalPrice();
-    });
+  // 선택된 항목 삭제
+  Future<void> _deleteSelectedItems() async {
+    List<String> selectedCartIds = [];
+
+    // 먼저 token을 가져옵니다.
+    final String token = await _getToken();
+
+    if (token.isEmpty) {
+      showErrorDialog('로그인 정보가 부족합니다.');
+      return;
+    }
+
+    // 선택된 항목의 cartId 수집
+    for (var item in cartItems) {
+      if (item['isSelected'] == true) {
+        selectedCartIds.add(item['cartId']); // cartId를 수집
+      }
+    }
+
+    if (selectedCartIds.isEmpty) {
+      showErrorDialog('선택된 항목이 없습니다.');
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("삭제 확인"),
+          content: Text("선택된 항목을 삭제하시겠습니까?"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                // 취소 버튼 클릭 시
+                Navigator.of(context).pop();
+              },
+              child: Text("취소"),
+            ),
+            TextButton(
+              onPressed: () async {
+                // 삭제 버튼 클릭 시
+                try {
+                  // 선택된 각 항목에 대해 deleteCartItem 호출
+                  for (var cartId in selectedCartIds) {
+                    await CartController.deleteCartItem(cartId);
+                  }
+
+                  // cartItems에서 삭제된 항목을 제거 후 새로운 리스트로 상태 갱신
+                  setState(() {
+                    cartItems.removeWhere((item) => selectedCartIds.contains(item['cartId']));
+                    totalPrice = getTotalPrice();
+                  });
+
+                  Navigator.of(context).pop();
+                } catch (e) {
+                  showErrorDialog('삭제 실패: $e');
+                  Navigator.of(context).pop();
+                }
+              },
+              child: Text("삭제", style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
   }
+
+
 
   void _toggleSelectAll(bool value) {
     setState(() {
@@ -114,11 +174,9 @@ class _CartDetailScreenState extends State<CartDetailScreen> {
     }
   }
 
-
-// productItems에서 productId에 해당하는 제품의 mainImageUrl 가져오기
+  // productItems에서 productId에 해당하는 제품의 mainImageUrl 가져오기
   String _getMainImageUrl(String productId) {
     final product = productItems.firstWhere(
-
           (item) => item['id'] == productId,
       orElse: () => <String, String>{},  // 빈 Map<String, String> 반환
     );
@@ -128,7 +186,6 @@ class _CartDetailScreenState extends State<CartDetailScreen> {
         ? product['mainImageUrl']
         : ''; // 기본 이미지 URL
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -219,7 +276,6 @@ class _CartDetailScreenState extends State<CartDetailScreen> {
                             ),
                           ),
                           SizedBox(width: 16),
-                          // 텍스트 정보
                           // 텍스트 정보
                           Expanded(
                             child: Column(
@@ -353,7 +409,6 @@ class _CartDetailScreenState extends State<CartDetailScreen> {
       ),
     );
   }
-
 
   // 가격 정보를 표시하는 행 생성
   Widget _buildPriceRow(String label, String value) {
