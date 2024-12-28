@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../controllers/cart_controller.dart';
 import '../../controllers/product_controller.dart';
 import '../../controllers/profile_screen_controller.dart';
+import '../product_activity/product_detail_screen.dart';
 
 class CartDetailScreen extends StatefulWidget {
   @override
@@ -14,6 +15,8 @@ class _CartDetailScreenState extends State<CartDetailScreen> {
   final CartController cartController = CartController();
   List<Map<String, dynamic>> cartItems = [];
   List<Map<String, dynamic>> productItems = [];
+  List<Map<String, String>> products = [];
+
   bool isAllSelected = false;
   int totalPrice = 0;
 
@@ -21,6 +24,7 @@ class _CartDetailScreenState extends State<CartDetailScreen> {
   void initState() {
     super.initState();
     _loadCartData();
+    _loadProducts();
   }
 
   // 장바구니 데이터 로드
@@ -147,7 +151,18 @@ class _CartDetailScreenState extends State<CartDetailScreen> {
       totalPrice = getTotalPrice();
     });
   }
-
+  Future<void> _loadProducts() async {
+    try {
+      ProductController controller = ProductController();
+      List<Map<String, String>> fetchedProducts = await controller.fetchProducts();
+      setState(() {
+        products = fetchedProducts;
+      });
+    } catch (e) {
+      // 데이터를 불러오지 못했을 때 콘솔에 오류 메시지 출력
+      print('Error loading products: $e');
+    }
+  }
   // 상품 정보 불러오기
   Future<void> _loadProductsData() async {
     try {
@@ -263,16 +278,34 @@ class _CartDetailScreenState extends State<CartDetailScreen> {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // 이미지
-                          Container(
-                            width: 100,
-                            height: 100,
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                image: NetworkImage(mainImageUrl),
-                                fit: BoxFit.cover,
+                          // 이미지 클릭 시 이동
+                          GestureDetector(
+                            onTap: () {
+                              if (products.isNotEmpty && products[index].containsKey('id')) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ProductDetailScreen(
+                                      product: products[index],
+                                      productId: products[index]['id']!,
+                                    ),
+                                  ),
+                                );
+                              } else {
+                                // 제품 정보가 없을 때 처리
+                                showErrorDialog('제품 정보가 없습니다.');
+                              }
+                            },
+                            child: Container(
+                              width: 100,
+                              height: 100,
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  image: NetworkImage(mainImageUrl),
+                                  fit: BoxFit.cover,
+                                ),
+                                borderRadius: BorderRadius.circular(8),
                               ),
-                              borderRadius: BorderRadius.circular(8),
                             ),
                           ),
                           SizedBox(width: 16),
@@ -377,7 +410,7 @@ class _CartDetailScreenState extends State<CartDetailScreen> {
                   ),
                 );
               },
-            ),
+            )
           ),
           Padding(
             padding: const EdgeInsets.all(16.0),
