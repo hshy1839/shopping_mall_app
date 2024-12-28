@@ -18,7 +18,7 @@ class ProductController {
       }
 
       final response = await http.get(
-        Uri.parse('http://172.30.49.73:8863/api/products/allProduct'),
+        Uri.parse('http://192.168.25.27:8863/api/products/allProduct'),
         headers: {
           'Authorization': 'Bearer $token', // Bearer 토큰 추가
         },
@@ -33,7 +33,7 @@ class ProductController {
 
         if (decodedResponse is Map<String, dynamic> && decodedResponse['products'] is List<dynamic>) {
           final List<dynamic> data = decodedResponse['products'];
-          const serverUrl = 'http://172.30.49.73:8863'; // 서버 URL 설정
+          const serverUrl = 'http://192.168.25.27:8863'; // 서버 URL 설정
 
           return data.reversed.map((item) {
             final originalDate = item['createdAt']?.toString() ?? '';
@@ -93,4 +93,57 @@ class ProductController {
       return originalDate; // 날짜 형식이 잘못된 경우 원본 반환
     }
   }
+
+  Future<Map<String, dynamic>> getProductInfoById(String productId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token') ?? ''; // 저장된 토큰 불러오기
+
+      if (token.isEmpty) {
+        throw Exception('토큰이 없습니다. 로그인 상태를 확인하세요.');
+      }
+
+      final response = await http.get(
+        Uri.parse('http://192.168.25.27:8863/api/products/Product/$productId'),
+        headers: {
+          'Authorization': 'Bearer $token', // Bearer 토큰 추가
+        },
+      );
+
+
+      if (response.statusCode == 200) {
+        final decodedResponse = json.decode(response.body);
+        const serverUrl = 'http://192.168.25.27:8863';
+
+        final mainImageUrl = decodedResponse['product']['mainImage'] != null &&  decodedResponse['product']['mainImage'] is List<dynamic>
+            ? ( decodedResponse['product']['mainImage'] as List<dynamic>).isNotEmpty
+            ? '$serverUrl${ decodedResponse['product']['mainImage'][0]}' // 서버 URL 추가
+            : ''  // 비어있으면 빈 문자열 반환
+            : '';  // mainImage가 null이거나 List가 아니면 빈 문자열 반환
+
+        if (decodedResponse is Map<String, dynamic> &&
+            decodedResponse['product'] is Map<String, dynamic>) {
+          // 서버에서 제공하는 제품 데이터를 포함한 Map 반환
+          return {
+            'id': decodedResponse['product']['_id'], // _id를 id로 매핑
+            'name': decodedResponse['product']['name']?.toString() ?? '',
+            'price': decodedResponse['product']['price']?.toString() ?? '',
+            'mainImageUrl':mainImageUrl,
+            'description': decodedResponse['product']['description']?.toString() ?? '',
+          };
+        } else {
+          return {}; // 예상과 다른 응답 데이터일 경우 빈 Map 반환
+        }
+      } else {
+        print('API 호출 실패: ${response.statusCode}, ${response.body}');
+        return {}; // 실패 시 빈 Map 반환
+      }
+    } catch (error) {
+      print('제품 이미지 조회 중 오류 발생: $error');
+      return {}; // 오류 발생 시 빈 Map 반환
+    }
+  }
+
 }
+
+

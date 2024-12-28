@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../controllers/cart_controller.dart';
+import '../../controllers/product_controller.dart';
 import '../../controllers/profile_screen_controller.dart';
 
 class CartDetailScreen extends StatefulWidget {
@@ -11,7 +12,10 @@ class CartDetailScreen extends StatefulWidget {
 
 class _CartDetailScreenState extends State<CartDetailScreen> {
   final CartController cartController = CartController();
-  List<Map<String, dynamic>> cartItems = []; // 서버에서 받은 데이터를 저장할 리스트
+  List<Map<String, dynamic>> cartItems = [];
+  List<Map<String, dynamic>> productItems = [];
+  bool isAllSelected = false;
+  int totalPrice = 0;
 
   @override
   void initState() {
@@ -19,121 +23,302 @@ class _CartDetailScreenState extends State<CartDetailScreen> {
     _loadCartData();
   }
 
+
+
   // 장바구니 데이터 로드
   Future<void> _loadCartData() async {
     try {
-      // ProfileScreenController에서 userId와 token을 가져옴
       final profileController = ProfileScreenController();
-      await profileController.fetchUserId(context); // userId를 fetchUserId로 가져옴
-
+      await profileController.fetchUserId(context);
       final String userId = profileController.userId;
-      final String token = await _getToken(); // token을 SharedPreferences에서 불러옴
+      final String token = await _getToken();
 
       if (userId.isEmpty || token.isEmpty) {
         throw Exception('로그인 정보가 부족합니다.');
       }
 
-      // CartController의 fetchCartData 호출
       final items = await CartController().fetchCartData(userId, token);
 
-      // mounted 확인 후 setState 호출
       if (mounted) {
         setState(() {
           cartItems = items;
+          totalPrice = getTotalPrice();
         });
+
+        // cartItems 로드 후 product 데이터 불러오기
+        _loadProductsData();
       }
     } catch (e) {
       showErrorDialog(e.toString());
     }
   }
 
-  // token을 SharedPreferences에서 가져오는 함수
   Future<String> _getToken() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('token') ?? '';
   }
 
-  // 오류 다이얼로그 표시
   void showErrorDialog(String message) {
-    print(message);
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('오류'),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text('확인'),
-          ),
-        ],
-      ),
-    );
+    print('오류: $message');
   }
 
-  // 총 금액 계산
   int getTotalPrice() {
     return cartItems.fold(0, (total, item) {
-      // totalPrice를 int로 변환
-      return total + (item['totalPrice'] as num).toInt();
+      if (item['isSelected'] == true) {
+        return total + (item['totalPrice'] as num).toInt();
+      }
+      return total;
     });
   }
 
-  // 선택된 아이템 삭제
   void _deleteSelectedItems() {
     setState(() {
       cartItems.removeWhere((item) => item['isSelected'] == true);
+      totalPrice = getTotalPrice();
     });
   }
+
+  void _toggleSelectAll(bool value) {
+    setState(() {
+      isAllSelected = value;
+      for (var item in cartItems) {
+        item['isSelected'] = value;
+      }
+      totalPrice = getTotalPrice();
+    });
+  }
+
+  // 상품 정보 불러오기
+  Future<void> _loadProductsData() async {
+    try {
+      final productsController = ProductController();
+
+      for (var item in cartItems) {
+        final productId = item['productId'];
+
+        final product = await productsController.getProductInfoById(productId);
+
+        if (product.isNotEmpty) {
+          if (mounted) {
+            setState(() {
+              productItems.add(product);
+            });
+          }
+        } else {
+          print('Product data is empty for ID: $productId');
+        }
+      }
+    } catch (e) {
+      print('Error occurred while loading products: $e');
+      showErrorDialog(e.toString());
+    }
+  }
+
+
+// productItems에서 productId에 해당하는 제품의 mainImageUrl 가져오기
+  String _getMainImageUrl(String productId) {
+    final product = productItems.firstWhere(
+
+          (item) => item['id'] == productId,
+      orElse: () => <String, String>{},  // 빈 Map<String, String> 반환
+    );
+
+    // URL이 유효하지 않으면 기본 이미지 URL을 반환
+    return product['mainImageUrl']?.isNotEmpty == true
+        ? product['mainImageUrl']
+        : ''; // 기본 이미지 URL
+  }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('장바구니'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.delete),
-            onPressed: _deleteSelectedItems,
-          ),
-        ],
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: Text(
+          '장바구니',
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        ),
       ),
       body: cartItems.isEmpty
-          ? Center(child: CircularProgressIndicator()) // 데이터가 비었을 경우 로딩 표시
+          ? Center(
+        child: Text(
+          '장바구니 항목이 없습니다.',
+          style: TextStyle(fontSize: 18, color: Colors.grey),
+        ),
+      )
           : Column(
         children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Checkbox(
+                      value: isAllSelected,
+                      onChanged: (value) => _toggleSelectAll(value!),
+                      activeColor: Colors.blue,
+                    ),
+                    Text("전체 선택", style: TextStyle(fontSize: 16)),
+                  ],
+                ),
+                TextButton(
+                  onPressed: _deleteSelectedItems,
+                  child: Text(
+                    "선택 삭제",
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
           Expanded(
             child: ListView.builder(
               itemCount: cartItems.length,
               itemBuilder: (context, index) {
                 final item = cartItems[index];
-                return ListTile(
-                  leading: Checkbox(
-                    value: item['isSelected'] ?? false,
-                    onChanged: (value) {
-                      setState(() {
-                        item['isSelected'] = value;
-                      });
-                    },
+                final mainImageUrl = _getMainImageUrl(item['productId']); // productId로 이미지 URL 가져오기
+
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey.withOpacity(0.2)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.1),
+                          blurRadius: 8,
+                          spreadRadius: 4,
+                        ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // 이미지
+                          Container(
+                            width: 100,
+                            height: 100,
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                image: NetworkImage(mainImageUrl),
+                                fit: BoxFit.cover,
+                              ),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          SizedBox(width: 16),
+                          // 텍스트 정보
+                          // 텍스트 정보
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // 상품명
+                                Text(
+                                  item['productName'],
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(height: 8),
+                                // 사이즈/수량을 하나의 Row로 묶기
+                                if (item['sizes'] is List) ...[
+                                  Row(
+                                    children: [
+                                      for (var size in item['sizes'])
+                                        Padding(
+                                          padding: const EdgeInsets.only(right: 16.0), // 각 항목 간 간격
+                                          child: Row(
+                                            children: [
+                                              Text(
+                                                "${size['size']}",
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  color: Colors.grey[700],
+                                                ),
+                                              ),
+                                              SizedBox(width: 8), // 사이즈와 수량 간 간격
+                                              Text(
+                                                ": ${size['quantity']}",
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  color: Colors.grey[700],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                ] else if (item['sizes'] is Map) ...[
+                                  Row(
+                                    children: [
+                                      Text(
+                                        "${item['sizes']['size']}",
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey[700],
+                                        ),
+                                      ),
+                                      SizedBox(width: 8),
+                                      Text(
+                                        ": ${item['sizes']['quantity']}",
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey[700],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ] else ...[
+                                  Text(
+                                    "사이즈 정보 없음",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey[700],
+                                    ),
+                                  ),
+                                ],
+                                SizedBox(height: 8),
+                                // 금액
+                                Text(
+                                  "총 ${item['totalPrice']} 원",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          // 체크박스
+                          Checkbox(
+                            value: item['isSelected'] ?? false,
+                            onChanged: (value) {
+                              setState(() {
+                                item['isSelected'] = value;
+                                totalPrice = getTotalPrice();
+                              });
+                            },
+                            activeColor: Colors.blue,
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                  title: Text(item['productName']),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (item['sizes'] is List) ...[
-                        // 'sizes'가 List일 때
-                        for (var size in item['sizes'])
-                          Text("${size['size']} | 수량: ${size['quantity']}"),
-                      ] else if (item['sizes'] is Map) ...[
-                        // 'sizes'가 Map일 때
-                        Text("Size: ${item['sizes']['size']} | 수량: ${item['sizes']['quantity']}"),
-                      ] else ...[
-                        // sizes가 예상하지 못한 형태일 때
-                        Text("사이즈 정보 없음"),
-                      ]
-                    ],
-                  ),
-                  trailing: Text("${item['totalPrice']} 원"),
                 );
               },
             ),
@@ -143,15 +328,22 @@ class _CartDetailScreenState extends State<CartDetailScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildPriceRow("총 상품 금액", "${getTotalPrice()} 원"),
+                _buildPriceRow("총 상품 금액", "$totalPrice 원"),
                 SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () {
                     // 주문하기 버튼 동작
                   },
-                  child: Text("주문하기"),
+                  child: Text(
+                    "주문하기",
+                    style: TextStyle(color: Colors.white),
+                  ),
                   style: ElevatedButton.styleFrom(
                     minimumSize: Size(double.infinity, 50),
+                    backgroundColor: Colors.blue,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                 ),
               ],
@@ -162,13 +354,14 @@ class _CartDetailScreenState extends State<CartDetailScreen> {
     );
   }
 
+
   // 가격 정보를 표시하는 행 생성
   Widget _buildPriceRow(String label, String value) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label),
-        Text(value),
+        Text(label, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        Text(value, style: TextStyle(fontSize: 16)),
       ],
     );
   }

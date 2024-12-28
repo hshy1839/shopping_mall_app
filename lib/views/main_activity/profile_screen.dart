@@ -12,7 +12,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final String username = "회원님"; // 사용자 이름
   final int couponCount = 3; // 쿠폰 개수
   final int orderCount = 5; // 주문내역 개수
-  final int reviewCount = 2; // 나의 리뷰 개수
   final int inquiryCount = 1; // 문의 개수
 
   int _selectedIndex = 4; // 마이페이지 탭의 인덱스는 4로 설정
@@ -96,14 +95,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       count: orderCount,
                       onTap: () {
                         // 주문내역 화면으로 이동
-                      },
-                    ),
-                    _buildStatItem(
-                      context,
-                      title: '나의 리뷰',
-                      count: reviewCount,
-                      onTap: () {
-                        // 나의 리뷰 화면으로 이동
                       },
                     ),
                     _buildStatItem(

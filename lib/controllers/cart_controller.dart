@@ -11,12 +11,10 @@ class CartController {
   Future<List<Map<String, dynamic>>> fetchCartData(String userId, String token) async {
     try {
       final response = await http.get(
-        Uri.parse('http://172.30.49.73:8863/api/cart/$userId'),
+        Uri.parse('http://192.168.25.27:8863/api/cart/$userId'),
         headers: {'Authorization': 'Bearer $token'},
       );
 
-      print('Response Status: ${response.statusCode}');
-      print('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body); // Map으로 파싱
@@ -26,7 +24,8 @@ class CartController {
 
         return cartItems.map<Map<String, dynamic>>((item) {
           return {
-            'productId': item['_id'],
+            'cartId': item['_id'],
+            'productId': item['productId'],
             'productName': item['productName'],
             'sizes': item['sizes'],
             'price': item['price'],
@@ -45,7 +44,7 @@ class CartController {
 
 
 
-  static const String apiUrl = 'http://172.30.49.73:8863/api/cart'; // 서버 주소
+  static const String apiUrl = 'http://192.168.25.27:8863/api/cart'; // 서버 주소
 
   // 장바구니에 상품 추가하는 함수
   static Future<http.Response> addToCart({
