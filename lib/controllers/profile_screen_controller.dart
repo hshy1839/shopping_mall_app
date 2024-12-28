@@ -20,7 +20,7 @@ class ProfileScreenController extends ChangeNotifier {
 
       // 서버에서 사용자 정보를 가져옵니다.
       final response = await http.get(
-        Uri.parse('http://192.168.25.45:8863/api/users/userinfoget'),
+        Uri.parse('http://172.30.49.73:8863/api/users/userinfoget'),
         headers: {
           'Authorization': 'Bearer $token', // 헤더에 토큰 추가
         },

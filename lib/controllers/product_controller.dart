@@ -18,7 +18,7 @@ class ProductController {
       }
 
       final response = await http.get(
-        Uri.parse('http://192.168.25.45:8863/api/products/allProduct'),
+        Uri.parse('http://172.30.49.73:8863/api/products/allProduct'),
         headers: {
           'Authorization': 'Bearer $token', // Bearer 토큰 추가
         },
@@ -33,7 +33,7 @@ class ProductController {
 
         if (decodedResponse is Map<String, dynamic> && decodedResponse['products'] is List<dynamic>) {
           final List<dynamic> data = decodedResponse['products'];
-          const serverUrl = 'http://192.168.25.45:8863'; // 서버 URL 설정
+          const serverUrl = 'http://172.30.49.73:8863'; // 서버 URL 설정
 
           return data.reversed.map((item) {
             final originalDate = item['createdAt']?.toString() ?? '';

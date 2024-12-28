@@ -1,3 +1,4 @@
+import 'package:attedance_app/views/main_activity/cart_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
@@ -45,6 +46,8 @@ class MyApp extends StatelessWidget {
         return MaterialPageRoute(
           builder: (_) => ShoppingScreen(categoryName: 'Selected Category'),
         );
+      case '/cart':
+        return MaterialPageRoute(builder: (_) => CartDetailScreen());
       default:
         return MaterialPageRoute(builder: (_) => MainScreenWithFooter());
     }
