@@ -121,6 +121,10 @@ class ProductController {
             : ''  // 비어있으면 빈 문자열 반환
             : '';  // mainImage가 null이거나 List가 아니면 빈 문자열 반환
 
+        final category = decodedResponse['product']['category'] != null && decodedResponse['product']['category'] is Map<String, dynamic>
+            ? '${decodedResponse['product']['category']['main'] ?? ''} > ${decodedResponse['product']['category']['sub'] ?? ''}'
+            : '';
+
         if (decodedResponse is Map<String, dynamic> &&
             decodedResponse['product'] is Map<String, dynamic>) {
           // 서버에서 제공하는 제품 데이터를 포함한 Map 반환
@@ -129,7 +133,9 @@ class ProductController {
             'name': decodedResponse['product']['name']?.toString() ?? '',
             'price': decodedResponse['product']['price']?.toString() ?? '',
             'mainImageUrl':mainImageUrl,
+            'category':category,
             'description': decodedResponse['product']['description']?.toString() ?? '',
+
           };
         } else {
           return {}; // 예상과 다른 응답 데이터일 경우 빈 Map 반환

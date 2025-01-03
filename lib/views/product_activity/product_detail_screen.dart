@@ -515,11 +515,7 @@ class _ProductOptionsBottomSheetState extends State<ProductOptionsBottomSheet> {
                             ),
                           ),
                         );
-                        print('데이터 전달됨:');
-                        print('상품 ID: ${widget.productId}');
-                        print('사이즈 및 수량: $selectedSizes');
-
-                        print('총 금액: $totalAmount');
+                        print(selectedSizes);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.black,
