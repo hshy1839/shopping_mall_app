@@ -1,4 +1,5 @@
 import 'package:attedance_app/views/main_activity/cart_detail_screen.dart';
+import 'package:attedance_app/views/main_activity/order_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
@@ -48,6 +49,15 @@ class MyApp extends StatelessWidget {
         );
       case '/cart':
         return MaterialPageRoute(builder: (_) => CartDetailScreen());
+
+      case '/order':
+        return MaterialPageRoute(
+          builder: (_) => OrderScreen(
+            productId: '', // 기본값 제공
+            sizes: [],                     // 기본값 제공
+            totalAmount: 0,                // 기본값 제공
+          ),
+        );
       default:
         return MaterialPageRoute(builder: (_) => MainScreenWithFooter());
     }

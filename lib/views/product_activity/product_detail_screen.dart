@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../controllers/cart_controller.dart';
 import '../../controllers/profile_screen_controller.dart';
+import '../main_activity/order_screen.dart';
 
 class ProductDetailScreen extends StatelessWidget {
   final Map<String, dynamic> product; // 상품 데이터를 받을 필드 추가
@@ -488,7 +489,37 @@ class _ProductOptionsBottomSheetState extends State<ProductOptionsBottomSheet> {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
-                        // 구매하기 로직
+                        if (sizeQuantity.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('사이즈와 수량을 선택해주세요.')),
+                          );
+                          return;
+                        }
+
+                        // 결제 페이지로 전달할 데이터 준비
+                        List<Map<String, dynamic>> selectedSizes = sizeQuantity.entries
+                            .map((entry) => {
+                          'size': entry.key,
+                          'quantity': entry.value,
+                        })
+                            .toList();
+
+                        // 결제 화면으로 이동하며 데이터 전달
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => OrderScreen(
+                              productId: widget.productId,
+                              sizes: selectedSizes,
+                              totalAmount: totalAmount,
+                            ),
+                          ),
+                        );
+                        print('데이터 전달됨:');
+                        print('상품 ID: ${widget.productId}');
+                        print('사이즈 및 수량: $selectedSizes');
+
+                        print('총 금액: $totalAmount');
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.black,
@@ -498,11 +529,12 @@ class _ProductOptionsBottomSheetState extends State<ProductOptionsBottomSheet> {
                         padding: EdgeInsets.symmetric(vertical: 16),
                       ),
                       child: Text(
-                        '구매하기',
+                        '결제하기',
                         style: TextStyle(fontSize: 16, color: Colors.white),
                       ),
                     ),
                   ),
+
                 ],
               ),
             ),

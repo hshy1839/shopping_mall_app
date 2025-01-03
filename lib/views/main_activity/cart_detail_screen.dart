@@ -422,9 +422,11 @@ class _CartDetailScreenState extends State<CartDetailScreen> {
                 ElevatedButton(
                   onPressed: () {
                     // 주문하기 버튼 동작
+
+                    Navigator.pushNamed(context, '/order');
                   },
                   child: Text(
-                    "주문하기",
+                    "$totalPrice 원 결제하기",
                     style: TextStyle(color: Colors.white),
                   ),
                   style: ElevatedButton.styleFrom(
