@@ -4,7 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class OrderScreenController {
   // 서버 주소
-  static const String apiUrl = 'http://192.168.21.82:8863/api/order';
+  static const String orderApiUrl = 'http://192.168.203.46:8863/api/order';
+  static const String shippingApiUrl = 'http://192.168.203.46:8863/api/shipping';
 
   // 주문 추가 함수
   static Future<http.Response> addToOrder({
@@ -20,9 +21,8 @@ class OrderScreenController {
       if (token.isEmpty) {
         throw Exception('토큰이 없습니다. 로그인 상태를 확인하세요.');
       }
-
       final response = await http.post(
-        Uri.parse(apiUrl),
+        Uri.parse(orderApiUrl),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -38,6 +38,44 @@ class OrderScreenController {
       return response;
     } catch (e) {
       throw Exception('Failed to add order: $e');
+    }
+  }
+
+  // 배송 추가 함수
+  static Future<http.Response> addToShipping({
+    required String name,
+    required String phone,
+    required String address,
+    required String address2,
+    required String postalCode,
+  }) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token') ?? ''; // 저장된 토큰 불러오기
+
+      if (token.isEmpty) {
+        throw Exception('토큰이 없습니다. 로그인 상태를 확인하세요.');
+      }
+      final response = await http.post(
+        Uri.parse(shippingApiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({
+          'shippingAddress': {
+            'name': name,
+            'phone': phone,
+            'address': address,
+            'address2': address2,
+            'postalCode': postalCode,
+          },
+        }),
+      );
+
+      return response;
+    } catch (e) {
+      throw Exception('Failed to add shipping: $e');
     }
   }
 

@@ -11,6 +11,7 @@ import 'package:attedance_app/views/main_activity/category_screen.dart';
 import 'package:attedance_app/views/main_activity/main_screen.dart';
 import 'package:attedance_app/views/main_activity/notice_screen.dart';
 import 'package:attedance_app/views/main_activity/profile_screen.dart';
+import 'package:attedance_app/views/main_activity/order_check_screen.dart';
 import 'footer.dart';
 import 'package:attedance_app/shopping_screen/shopping_screen.dart';
 
@@ -49,6 +50,10 @@ class MyApp extends StatelessWidget {
         );
       case '/cart':
         return MaterialPageRoute(builder: (_) => CartDetailScreen());
+      case '/ordercheck':
+        return MaterialPageRoute(
+          builder: (context) => OrderCheckScreen(),
+        );
 
       case '/order':
         return MaterialPageRoute(
@@ -58,6 +63,7 @@ class MyApp extends StatelessWidget {
             totalAmount: 0,                // 기본값 제공
           ),
         );
+
       default:
         return MaterialPageRoute(builder: (_) => MainScreenWithFooter());
     }

@@ -176,6 +176,12 @@ class _OrderScreenState extends State<OrderScreen> {
   }
 
   void _showAddressInputSheet(BuildContext context) {
+    String name = '';
+    String phone = '';
+    String address = '';
+    String address2 = '';
+    String postalCode = '';
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -195,17 +201,67 @@ class _OrderScreenState extends State<OrderScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               TextField(
-                decoration: InputDecoration(labelText: '배송지'),
+                decoration: InputDecoration(labelText: '수령인 이름'),
                 onChanged: (value) {
-                  setState(() {
-                    address = value;
-                  });
+                  name = value;
+                },
+              ),
+              SizedBox(height: 10),
+              TextField(
+                decoration: InputDecoration(labelText: '연락처'),
+                onChanged: (value) {
+                  phone = value;
+                },
+              ),
+              SizedBox(height: 10),
+              TextField(
+                decoration: InputDecoration(labelText: '주소'),
+                onChanged: (value) {
+                  address = value;
+                },
+              ),
+              SizedBox(height: 10),
+              TextField(
+                decoration: InputDecoration(labelText: '상세 주소'),
+                onChanged: (value) {
+                  address2 = value;
+                },
+              ),
+              SizedBox(height: 10),
+              TextField(
+                decoration: InputDecoration(labelText: '우편번호'),
+                onChanged: (value) {
+                  postalCode = value;
                 },
               ),
               SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
+                onPressed: () async {
+                  // 서버에 데이터 저장
+                  try {
+                    final response = await OrderScreenController.addToShipping(
+                      name: name,
+                      phone: phone,
+                      address: address,
+                      address2: address2,
+                      postalCode: postalCode,
+                    );
+
+                    if (response.statusCode == 201) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('배송지가 성공적으로 저장되었습니다.')),
+                      );
+                      Navigator.pop(context); // 입력 완료 후 닫기
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('배송지 저장에 실패했습니다: ${response.body}')),
+                      );
+                    }
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('오류 발생: $e')),
+                    );
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.black,
@@ -213,12 +269,14 @@ class _OrderScreenState extends State<OrderScreen> {
                 ),
                 child: Text('배송지 저장', style: TextStyle(color: Colors.white)),
               ),
+              SizedBox(height: 20),
             ],
           ),
         );
       },
     );
-  }Widget _buildSectionTitle(String title) {
+  }
+  Widget _buildSectionTitle(String title) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 15.0),
       child: Text(
