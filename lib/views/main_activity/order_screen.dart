@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-
+import '../../controllers/order_screen_controller.dart'; // OrderScreenController를 import
 import '../../controllers/product_controller.dart';
 
 class OrderScreen extends StatefulWidget {
@@ -22,6 +22,7 @@ class OrderScreen extends StatefulWidget {
 class _OrderScreenState extends State<OrderScreen> {
   Map<String, dynamic>? productInfo;
   bool isLoading = true;
+  String? address; // 배송지 정보
 
   @override
   void initState() {
@@ -37,7 +38,6 @@ class _OrderScreenState extends State<OrderScreen> {
         productInfo = info;
         isLoading = false;
       });
-      print(productInfo);
     } catch (e) {
       print('제품 정보를 불러오는 중 오류 발생: $e');
       setState(() {
@@ -46,14 +46,61 @@ class _OrderScreenState extends State<OrderScreen> {
     }
   }
 
-  int _calculateTotalQuantity() {
-    return widget.sizes.fold<int>(0, (sum, item) => sum + (item['quantity'] as int? ?? 0));
-  }
+  Future<void> _handleOrderSubmission() async {
+    if (address == null || address!.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('배송지를 입력해주세요.')),
+      );
+      return;
+    }
 
+    try {
+      // 주문 데이터 생성
+      final List<Map<String, dynamic>> items = [
+        {
+          'productId': widget.productId,
+          'productName': productInfo?['name'] ?? '제품명 없음',
+          'sizes': widget.sizes,
+          'price': productInfo?['price'] ?? 0,
+          'totalPrice': widget.totalAmount,
+        }
+      ];
+
+      final List<Map<String, dynamic>> account = [
+        {
+          'accountName': '홍길동', // 예시 데이터
+          'accountNumber': '123-456-7890', // 예시 데이터
+        }
+      ];
+
+      // 서버로 데이터 전송
+      final response = await OrderScreenController.addToOrder(
+        account: account,
+        items: items,
+        totalAmount: widget.totalAmount.toDouble(),
+        address: address!,
+      );
+
+      if (response.statusCode == 201) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('주문이 성공적으로 완료되었습니다.')),
+        );
+        Navigator.pop(context); // 주문 성공 시 이전 화면으로 돌아가기
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('주문 실패: ${response.body}')),
+        );
+      }
+    } catch (e) {
+      print('주문 중 오류 발생: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('주문 중 오류가 발생했습니다.')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final totalQuantity = _calculateTotalQuantity();
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -76,7 +123,7 @@ class _OrderScreenState extends State<OrderScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildSectionTitle('주문 상품 총 $totalQuantity개'),
+              _buildSectionTitle('주문 상품 '),
               Divider(thickness: 1),
               _buildProductRow(productInfo!),
               Divider(thickness: 1),
@@ -87,10 +134,8 @@ class _OrderScreenState extends State<OrderScreen> {
               Divider(thickness: 1),
               _buildPriceDetails(widget.totalAmount),
               Divider(thickness: 1),
-              _buildSectionTitle('결제 방법'),
-              _buildPaymentOptions(),
               SizedBox(height: 30),
-              _buildPayButton(widget.totalAmount, widget.productId, widget.sizes),
+              _buildPayButton(),
             ],
           ),
         ),
@@ -98,7 +143,82 @@ class _OrderScreenState extends State<OrderScreen> {
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildPayButton() {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: _handleOrderSubmission, // 결제 버튼 클릭 시 _handleOrderSubmission 호출
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.red,
+          padding: EdgeInsets.symmetric(vertical: 15),
+        ),
+        child: Text(
+          '₩ ${widget.totalAmount} 결제하기',
+          style: TextStyle(color: Colors.white, fontSize: 16),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildClickableRow(String title, String actionText) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(title, style: TextStyle(fontSize: 16)),
+        GestureDetector(
+          onTap: () {
+            _showAddressInputSheet(context);
+          },
+          child: Text(actionText, style: TextStyle(color: Colors.blue)),
+        ),
+      ],
+    );
+  }
+
+  void _showAddressInputSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            top: 20,
+            left: 16,
+            right: 16,
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextField(
+                decoration: InputDecoration(labelText: '배송지'),
+                onChanged: (value) {
+                  setState(() {
+                    address = value;
+                  });
+                },
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.black,
+                  minimumSize: Size(double.infinity, 50),
+                ),
+                child: Text('배송지 저장', style: TextStyle(color: Colors.white)),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }Widget _buildSectionTitle(String title) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 15.0),
       child: Text(
@@ -168,107 +288,22 @@ class _OrderScreenState extends State<OrderScreen> {
     );
   }
 
-
-
-  Widget _buildClickableRow(String title, String actionText) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(title, style: TextStyle(fontSize: 16)),
-        Text(actionText, style: TextStyle(color: Colors.blue)),
-      ],
-    );
-  }
-
   Widget _buildCouponRow() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text('쿠폰', style: TextStyle(fontSize: 16)),
-        Row(
-          children: [
-            Text(
-              '전체 0장, 적용 가능 0장',
-              style: TextStyle(color: Colors.grey),
-            ),
-            SizedBox(width: 8),
-            ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey[200],
-                foregroundColor: Colors.black,
-                elevation: 0,
-              ),
-              child: Text('쿠폰 선택'),
-            ),
-          ],
-        ),
+        Text('쿠폰: 없음'),
       ],
     );
   }
 
   Widget _buildPriceDetails(int totalAmount) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              '총 결제금액',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            Text(
-              '₩ $totalAmount',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.red),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPaymentOptions() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _buildPaymentButton('간편결제'),
-        _buildPaymentButton('카드'),
-        _buildPaymentButton('현금'),
-        _buildPaymentButton('휴대폰'),
+        Text('총 금액:'),
+        Text('₩ $totalAmount'),
       ],
-    );
-  }
-
-  Widget _buildPaymentButton(String title) {
-    return ElevatedButton(
-      onPressed: () {},
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.grey[200],
-        foregroundColor: Colors.black,
-        elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-      ),
-      child: Text(title),
-    );
-  }
-
-  Widget _buildPayButton(int totalAmount, String productId, List<dynamic> sizes) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: () {
-          print('결제하기: 상품ID=$productId, 사이즈=$sizes, 총금액=$totalAmount');
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.red,
-          padding: EdgeInsets.symmetric(vertical: 15),
-        ),
-        child: Text(
-          '₩ $totalAmount 결제하기',
-          style: TextStyle(color: Colors.white, fontSize: 16),
-        ),
-      ),
     );
   }
 }

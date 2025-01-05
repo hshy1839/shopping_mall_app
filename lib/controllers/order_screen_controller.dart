@@ -1,0 +1,49 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
+class OrderScreenController {
+  // 서버 주소
+  static const String apiUrl = 'http://192.168.21.82:8863/api/order';
+
+  // 주문 추가 함수
+  static Future<http.Response> addToOrder({
+    required List<Map<String, dynamic>> account,
+    required List<Map<String, dynamic>> items,
+    required double totalAmount,
+    required String address, // address 파라미터 추가
+  }) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token') ?? ''; // 저장된 토큰 불러오기
+
+      if (token.isEmpty) {
+        throw Exception('토큰이 없습니다. 로그인 상태를 확인하세요.');
+      }
+
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({
+          'account': account,
+          'items': items,
+          'totalAmount': totalAmount,
+          'address': address, // address 데이터 포함
+        }),
+      );
+
+      return response;
+    } catch (e) {
+      throw Exception('Failed to add order: $e');
+    }
+  }
+
+  // 토큰 가져오기 (SharedPreferences 활용)
+  static Future<String?> getToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('token');
+  }
+}
