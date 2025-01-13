@@ -419,25 +419,43 @@ class _CartDetailScreenState extends State<CartDetailScreen> {
               children: [
                 _buildPriceRow("총 상품 금액", "$totalPrice 원"),
                 SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () {
-                    // 주문하기 버튼 동작
+    ElevatedButton(
+    onPressed: () {
+    // 선택된 상품 정보 수집
+    List<Map<String, dynamic>> selectedItems = cartItems
+        .where((item) => item['isSelected'] == true)
+        .toList();
 
-                    Navigator.pushNamed(context, '/order');
-                  },
-                  child: Text(
-                    "$totalPrice 원 결제하기",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: Size(double.infinity, 50),
-                    backgroundColor: Colors.blue,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                ),
-              ],
+    if (selectedItems.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text('상품을 선택해주세요.')),
+    );
+    return;
+    }
+
+
+    // 선택된 상품들의 정보를 OrderScreen으로 전달
+    Navigator.pushNamed(
+    context,
+    '/order',
+    arguments: {
+    'items': selectedItems, // 선택된 상품들의 전체 정보
+    },
+    );
+    },
+    child: Text(
+    "$totalPrice 원 결제하기",
+    style: TextStyle(color: Colors.white),
+    ),
+    style: ElevatedButton.styleFrom(
+    minimumSize: Size(double.infinity, 50),
+    backgroundColor: Colors.blue,
+    shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(8),
+    ),
+    ),
+    ),
+    ],
             ),
           ),
         ],

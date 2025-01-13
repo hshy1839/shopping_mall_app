@@ -27,6 +27,9 @@ class _OrderScreenState extends State<OrderScreen> {
   @override
   void initState() {
     super.initState();
+    print('OrderScreen received productId: ${widget.productId}');
+    print('OrderScreen received sizes: ${widget.sizes}');
+    print('OrderScreen received totalAmount: ${widget.totalAmount}');
     fetchProductInfo();
   }
 
@@ -175,12 +178,28 @@ class _OrderScreenState extends State<OrderScreen> {
     );
   }
 
-  void _showAddressInputSheet(BuildContext context) {
+  void _showAddressInputSheet(BuildContext context) async {
     String name = '';
     String phone = '';
     String address = '';
     String address2 = '';
     String postalCode = '';
+
+    // 기존 배송 정보 가져오기
+    try {
+      final shippingInfo = await OrderScreenController.getShipping();
+      if (shippingInfo.containsKey('shipping')) {
+        final shippingAddress = shippingInfo['shipping']['shippingAddress'];
+        name = shippingAddress['name'] ?? '';
+        phone = shippingAddress['phone'] ?? '';
+        address = shippingAddress['address'] ?? '';
+        address2 = shippingAddress['address2'] ?? '';
+        postalCode = shippingAddress['postalCode'] ?? '';
+      }
+    } catch (e) {
+      print('배송 정보 로드 실패: $e');
+      // 이전 배송 정보가 없을 경우 기본값으로 유지
+    }
 
     showModalBottomSheet(
       context: context,
@@ -201,6 +220,7 @@ class _OrderScreenState extends State<OrderScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               TextField(
+                controller: TextEditingController(text: name),
                 decoration: InputDecoration(labelText: '수령인 이름'),
                 onChanged: (value) {
                   name = value;
@@ -208,6 +228,7 @@ class _OrderScreenState extends State<OrderScreen> {
               ),
               SizedBox(height: 10),
               TextField(
+                controller: TextEditingController(text: phone),
                 decoration: InputDecoration(labelText: '연락처'),
                 onChanged: (value) {
                   phone = value;
@@ -215,6 +236,7 @@ class _OrderScreenState extends State<OrderScreen> {
               ),
               SizedBox(height: 10),
               TextField(
+                controller: TextEditingController(text: address),
                 decoration: InputDecoration(labelText: '주소'),
                 onChanged: (value) {
                   address = value;
@@ -222,6 +244,7 @@ class _OrderScreenState extends State<OrderScreen> {
               ),
               SizedBox(height: 10),
               TextField(
+                controller: TextEditingController(text: address2),
                 decoration: InputDecoration(labelText: '상세 주소'),
                 onChanged: (value) {
                   address2 = value;
@@ -229,6 +252,7 @@ class _OrderScreenState extends State<OrderScreen> {
               ),
               SizedBox(height: 10),
               TextField(
+                controller: TextEditingController(text: postalCode),
                 decoration: InputDecoration(labelText: '우편번호'),
                 onChanged: (value) {
                   postalCode = value;
@@ -276,6 +300,7 @@ class _OrderScreenState extends State<OrderScreen> {
       },
     );
   }
+
   Widget _buildSectionTitle(String title) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 15.0),

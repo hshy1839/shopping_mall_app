@@ -57,12 +57,38 @@ class MyApp extends StatelessWidget {
 
       case '/order':
         return MaterialPageRoute(
-          builder: (_) => OrderScreen(
-            productId: '', // 기본값 제공
-            sizes: [],                     // 기본값 제공
-            totalAmount: 0,                // 기본값 제공
-          ),
+          builder: (context) {
+            final arguments = settings.arguments as Map<String, dynamic>?;
+
+            if (arguments == null || arguments['items'] == null || arguments['items'].isEmpty) {
+              print('Error: Invalid arguments or items missing');
+              return Scaffold(
+                body: Center(
+                  child: Text('Invalid arguments passed to OrderScreen'),
+                ),
+              );
+            }
+
+            final firstItem = arguments['items'][0] as Map<String, dynamic>;
+            final productId = firstItem['productId'] ?? '';
+            final sizes = (firstItem['sizes'] as List<dynamic>)
+                .map((e) => e as Map<String, dynamic>)
+                .toList(); // 명시적으로 변환
+            final totalAmount = firstItem['totalPrice'] ?? 0;
+
+            print('Extracted productId: $productId');
+            print('Extracted sizes: $sizes');
+            print('Extracted totalAmount: $totalAmount');
+
+            return OrderScreen(
+              productId: productId,
+              sizes: sizes,
+              totalAmount: totalAmount,
+            );
+          },
         );
+
+
 
       default:
         return MaterialPageRoute(builder: (_) => MainScreenWithFooter());

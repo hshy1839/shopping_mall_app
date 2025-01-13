@@ -35,7 +35,7 @@ class _OrderCheckScreenState extends State<OrderCheckScreen> {
   Future<void> fetchOrderData() async {
     try {
       // 서버 요청 URL
-      const String apiUrl = 'http://192.168.203.46:8863/api/orders'; // 서버 URL을 입력하세요.
+      const String apiUrl = 'http://172.30.49.11:8863/api/orders'; // 서버 URL을 입력하세요.
 
       // 토큰이 필요하면 SharedPreferences에서 가져옵니다.
       // final prefs = await SharedPreferences.getInstance();
