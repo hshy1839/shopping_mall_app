@@ -27,9 +27,6 @@ class _OrderScreenState extends State<OrderScreen> {
   @override
   void initState() {
     super.initState();
-    print('OrderScreen received productId: ${widget.productId}');
-    print('OrderScreen received sizes: ${widget.sizes}');
-    print('OrderScreen received totalAmount: ${widget.totalAmount}');
     fetchProductInfo();
   }
 
@@ -84,7 +81,7 @@ class _OrderScreenState extends State<OrderScreen> {
         address: address!,
       );
 
-      if (response.statusCode == 201) {
+      if (response.statusCode == 201 ) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('주문이 성공적으로 완료되었습니다.')),
         );
@@ -271,7 +268,7 @@ class _OrderScreenState extends State<OrderScreen> {
                       postalCode: postalCode,
                     );
 
-                    if (response.statusCode == 201) {
+                    if (response.statusCode == 201 || response.statusCode == 200) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('배송지가 성공적으로 저장되었습니다.')),
                       );

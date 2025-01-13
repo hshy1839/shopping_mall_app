@@ -76,9 +76,6 @@ class MyApp extends StatelessWidget {
                 .toList(); // 명시적으로 변환
             final totalAmount = firstItem['totalPrice'] ?? 0;
 
-            print('Extracted productId: $productId');
-            print('Extracted sizes: $sizes');
-            print('Extracted totalAmount: $totalAmount');
 
             return OrderScreen(
               productId: productId,
