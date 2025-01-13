@@ -130,46 +130,12 @@ class SignUpScreen extends StatelessWidget {
                     );
                   },
                 ),
-                SizedBox(height: 16),
 
                 // 주소 입력 필드
-                Consumer<SignupController>(
-                  builder: (context, controller, child) {
-                    return TextField(
-                      controller: controller.addressController,
-                      decoration: InputDecoration(
-                        labelText: '주소',
-                        border: OutlineInputBorder(),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.grey),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.grey),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-                SizedBox(height: 16),
+
 
                 // 상세 주소 입력 필드
-                Consumer<SignupController>(
-                  builder: (context, controller, child) {
-                    return TextField(
-                      controller: controller.addressDetailController,
-                      decoration: InputDecoration(
-                        labelText: '상세주소',
-                        border: OutlineInputBorder(),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.grey),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.grey),
-                        ),
-                      ),
-                    );
-                  },
-                ),
+
                 SizedBox(height: 24),
 
                 // 회원가입 버튼

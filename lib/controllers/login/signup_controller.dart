@@ -9,8 +9,6 @@ class SignupController extends ChangeNotifier {
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
   final phoneController = TextEditingController();
-  final addressController = TextEditingController();
-  final addressDetailController = TextEditingController();
 
   String errorMessage = '';
 
@@ -20,9 +18,8 @@ class SignupController extends ChangeNotifier {
         usernameController.text.isEmpty ||
         passwordController.text.isEmpty ||
         confirmPasswordController.text.isEmpty ||
-        phoneController.text.isEmpty ||
-        addressController.text.isEmpty ||
-        addressDetailController.text.isEmpty) {
+        phoneController.text.isEmpty)
+         {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('칸을 모두 채워주세요'),
@@ -49,8 +46,6 @@ class SignupController extends ChangeNotifier {
         'password': passwordController.text,
         'phoneNumber': phoneController.text,
         'is_active': false,
-        'address': addressController.text,
-        'address_detail': addressDetailController.text,
       }),
     );
 
@@ -77,8 +72,6 @@ class SignupController extends ChangeNotifier {
     passwordController.dispose();
     confirmPasswordController.dispose();
     phoneController.dispose();
-    addressController.dispose();
-    addressDetailController.dispose();
     super.dispose();
   }
 }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../controllers/profile_screen_controller.dart';
-import '../../footer.dart';
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -9,12 +8,34 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   final ProfileScreenController _controller = ProfileScreenController(); // 컨트롤러 인스턴스
-  final String username = "회원님"; // 사용자 이름
+  String username = "회원님"; // 초기 사용자 이름
+  int orderCount = 0; // 초기 주문 내역 개수
   final int couponCount = 3; // 쿠폰 개수
-  final int orderCount = 5; // 주문내역 개수
   final int inquiryCount = 1; // 문의 개수
 
   int _selectedIndex = 4; // 마이페이지 탭의 인덱스는 4로 설정
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUserDetailsAndOrders(); // 사용자 정보와 주문 내역 가져오기
+  }
+
+  Future<void> fetchUserDetailsAndOrders() async {
+    try {
+      // 사용자 정보 가져오기
+      await _controller.fetchUserDetails(context);
+      // 주문 내역 가져오기
+      await _controller.fetchUserOrders(context);
+
+      setState(() {
+        username = _controller.username; // 사용자 이름 업데이트
+        orderCount = _controller.orders.length; // 주문 내역 개수 업데이트
+      });
+    } catch (e) {
+      print('데이터를 가져오는 중 오류 발생: $e');
+    }
+  }
 
   void _onTabTapped(int index) {
     setState(() {
@@ -58,7 +79,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   SizedBox(height: 5.0),
                   Text(
-                    '$username',
+                    '$username 님',
                     style: TextStyle(
                       fontSize: 24.0,
                       fontWeight: FontWeight.bold,
@@ -94,7 +115,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       title: '주문내역',
                       count: orderCount,
                       onTap: () {
-                        // 주문내역 화면으로 이동
+                        Navigator.pushNamed(context, '/orderdetail'); // 주문내역 화면으로 이동
                       },
                     ),
                     _buildStatItem(
@@ -114,7 +135,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             // 공지사항, 약관 및 정책
             ListTile(
-              title: Text('공지사항', style: TextStyle( fontWeight: FontWeight.bold, color: Colors.black),),
+              title: Text('공지사항', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
               leading: Icon(Icons.notifications, color: Colors.grey), // 공지사항 아이콘
               trailing: Icon(Icons.arrow_forward_ios, size: 16.0, color: Colors.grey),
               onTap: () {
@@ -123,7 +144,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             Divider(color: Colors.grey[300], thickness: 1.0),
             ListTile(
-              title: Text('개인정보 수정', style: TextStyle( fontWeight: FontWeight.bold, color: Colors.black),),
+              title: Text('개인정보 수정', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
               leading: Icon(Icons.person_outline, color: Colors.grey), // 개인정보 수정 아이콘
               trailing: Icon(Icons.arrow_forward_ios, size: 16.0, color: Colors.grey),
               onTap: () {
@@ -132,7 +153,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             Divider(color: Colors.grey[300], thickness: 1.0),
             ListTile(
-              title: Text('고객센터', style: TextStyle( fontWeight: FontWeight.bold, color: Colors.black),),
+              title: Text('고객센터', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
               leading: Icon(Icons.call, color: Colors.grey), // 고객센터 아이콘
               trailing: Icon(Icons.arrow_forward_ios, size: 16.0, color: Colors.grey),
               onTap: () {
@@ -141,7 +162,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             Divider(color: Colors.grey[300], thickness: 1.0),
             ListTile(
-              title: Text('개인정보처리방침', style: TextStyle( fontWeight: FontWeight.bold, color: Colors.black),),
+              title: Text('개인정보처리방침', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
               leading: Icon(Icons.security, color: Colors.grey), // 개인정보처리방침 아이콘
               trailing: Icon(Icons.arrow_forward_ios, size: 16.0, color: Colors.grey),
               onTap: () {
@@ -150,7 +171,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             Divider(color: Colors.grey[300], thickness: 1.0),
             ListTile(
-              title: Text('서비스 이용약관', style: TextStyle( fontWeight: FontWeight.bold, color: Colors.black),),
+              title: Text('서비스 이용약관', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
               leading: Icon(Icons.description, color: Colors.grey), // 서비스 이용약관 아이콘
               trailing: Icon(Icons.arrow_forward_ios, size: 16.0, color: Colors.grey),
               onTap: () {
@@ -163,7 +184,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 children: [
                   Icon(Icons.logout, color: Colors.grey), // 로그아웃 아이콘 추가
                   SizedBox(width: 10),
-                  Text('로그아웃', style: TextStyle( fontWeight: FontWeight.bold, color: Colors.black),),
+                  Text('로그아웃', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
                 ],
               ),
               trailing: Icon(Icons.arrow_forward_ios, size: 16.0, color: Colors.grey),

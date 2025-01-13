@@ -11,7 +11,7 @@ import 'package:attedance_app/views/main_activity/category_screen.dart';
 import 'package:attedance_app/views/main_activity/main_screen.dart';
 import 'package:attedance_app/views/main_activity/notice_screen.dart';
 import 'package:attedance_app/views/main_activity/profile_screen.dart';
-import 'package:attedance_app/views/main_activity/order_check_screen.dart';
+import 'package:attedance_app/views/main_activity/order_detail_screen.dart';
 import 'footer.dart';
 import 'package:attedance_app/shopping_screen/shopping_screen.dart';
 
@@ -50,9 +50,9 @@ class MyApp extends StatelessWidget {
         );
       case '/cart':
         return MaterialPageRoute(builder: (_) => CartDetailScreen());
-      case '/ordercheck':
+      case '/orderdetail':
         return MaterialPageRoute(
-          builder: (context) => OrderCheckScreen(),
+          builder: (context) => OrderDetailScreen(),
         );
 
       case '/order':
