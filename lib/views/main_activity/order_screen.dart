@@ -28,6 +28,7 @@ class _OrderScreenState extends State<OrderScreen> {
   void initState() {
     super.initState();
     fetchProductInfo();
+    fetchShippingInfo();
   }
 
   Future<void> fetchProductInfo() async {
@@ -46,6 +47,19 @@ class _OrderScreenState extends State<OrderScreen> {
     }
   }
 
+  Future<void> fetchShippingInfo() async {
+    try {
+      final shippingInfo = await OrderScreenController.getShipping();
+      if (shippingInfo.containsKey('shipping')) {
+        final shippingAddress = shippingInfo['shipping']['shippingAddress'];
+        setState(() {
+          address = shippingAddress['address'] ?? ''; // 배송지 설정
+        });
+      }
+    } catch (e) {
+      print('기존 배송 정보 로드 실패: $e');
+    }
+  }
   Future<void> _handleOrderSubmission() async {
     if (address == null || address!.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
