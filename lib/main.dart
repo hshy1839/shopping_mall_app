@@ -1,3 +1,4 @@
+import 'package:attedance_app/views/main_activity/account_screen.dart';
 import 'package:attedance_app/views/main_activity/cart_detail_screen.dart';
 import 'package:attedance_app/views/main_activity/order_screen.dart';
 import 'package:attedance_app/views/main_activity/qna_create_screen.dart';
@@ -48,6 +49,8 @@ class MyApp extends StatelessWidget {
         return MaterialPageRoute(builder: (_) => NoticeScreen());
       case '/qna':
         return MaterialPageRoute(builder: (_) => QnaScreen());
+      case '/accountInfo':
+        return MaterialPageRoute(builder: (_) => AccountScreen());
       case '/qnaCreate':
         return MaterialPageRoute(builder: (_) => QnaCreateScreen());
       case '/shoppingscreen':

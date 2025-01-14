@@ -182,13 +182,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             Divider(color: Colors.grey[300], thickness: 1.0),
             ListTile(
-              title: Text('고객센터', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
+              title: Text('결제 계좌 정보', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
               leading: Icon(Icons.call, color: Colors.grey), // 고객센터 아이콘
               trailing: Icon(Icons.arrow_forward_ios, size: 16.0, color: Colors.grey),
               onTap: () {
                 // 고객센터 화면으로 이동
+                Navigator.pushNamed(context, '/accountInfo');
               },
             ),
+
           ],
         ),
       ),
