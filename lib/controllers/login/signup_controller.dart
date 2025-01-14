@@ -36,7 +36,7 @@ class SignupController extends ChangeNotifier {
     }
 
     final response = await http.post(
-      Uri.parse('http://172.30.49.11:8863/api/users/signup'),
+      Uri.parse('http://172.29.17.152:8863/api/users/signup'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },

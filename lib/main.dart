@@ -1,5 +1,7 @@
 import 'package:attedance_app/views/main_activity/cart_detail_screen.dart';
 import 'package:attedance_app/views/main_activity/order_screen.dart';
+import 'package:attedance_app/views/main_activity/qna_create_screen.dart';
+import 'package:attedance_app/views/main_activity/qna_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
@@ -44,6 +46,10 @@ class MyApp extends StatelessWidget {
         return MaterialPageRoute(builder: (_) => SignUpScreen());
       case '/notice':
         return MaterialPageRoute(builder: (_) => NoticeScreen());
+      case '/qna':
+        return MaterialPageRoute(builder: (_) => QnaScreen());
+      case '/qnaCreate':
+        return MaterialPageRoute(builder: (_) => QnaCreateScreen());
       case '/shoppingscreen':
         return MaterialPageRoute(
           builder: (_) => ShoppingScreen(categoryName: 'Selected Category'),
@@ -138,7 +144,7 @@ class _MainScreenWithFooterState extends State<MainScreenWithFooter> {
   final List<Widget> _pages = [
     MainScreen(),
     CategoryScreen(),
-    LoginScreen(), // 로그인 화면을 추가하여 리디렉션 처리
+    OrderDetailScreen(), // 로그인 화면을 추가하여 리디렉션 처리
     ProfileScreen(),
   ];
 

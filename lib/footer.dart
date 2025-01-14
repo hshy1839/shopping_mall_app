@@ -32,7 +32,7 @@ class Footer extends StatelessWidget {
           _buildFooterItem(
             context,
             icon: Icons.receipt_long_outlined,
-            label: '구매내역',
+            label: '주문내역',
             index: 2,
           ),
           // 마이페이지 탭

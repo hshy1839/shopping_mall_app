@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ProfileScreenController extends ChangeNotifier {
   String userId = ''; // 사용자 ID 초기화
   String username = ''; // 사용자 이름 초기화
+  String name = '';
   List<dynamic> orders = []; // 주문 정보 리스트
 
   Future<void> fetchUserId(BuildContext context) async {
@@ -18,7 +19,7 @@ class ProfileScreenController extends ChangeNotifier {
       }
 
       final response = await http.get(
-        Uri.parse('http://172.30.49.11:8863/api/users/userinfoget'),
+        Uri.parse('http://172.29.17.152:8863/api/users/userinfoget'),
         headers: {
           'Authorization': 'Bearer $token',
         },
@@ -54,7 +55,7 @@ class ProfileScreenController extends ChangeNotifier {
       }
 
       final response = await http.get(
-        Uri.parse('http://172.30.49.11:8863/api/users/userinfoget'),
+        Uri.parse('http://172.29.17.152:8863/api/users/userinfoget'),
         headers: {
           'Authorization': 'Bearer $token',
         },
@@ -65,6 +66,7 @@ class ProfileScreenController extends ChangeNotifier {
         if (data['user'] != null) {
           userId = data['user']['_id'] ?? '';
           username = data['user']['username'] ?? '';
+          name = data['user']['name'] ?? '';
           notifyListeners();
         } else {
           throw Exception('사용자 정보를 찾을 수 없습니다. ${response.body}');
@@ -91,7 +93,7 @@ class ProfileScreenController extends ChangeNotifier {
       }
 
       final response = await http.get(
-        Uri.parse('http://172.30.49.11:8863/api/orderByUser'),
+        Uri.parse('http://172.29.17.152:8863/api/orderByUser'),
         headers: {
           'Authorization': 'Bearer $token',
         },
@@ -102,7 +104,7 @@ class ProfileScreenController extends ChangeNotifier {
         if (data['orders'] != null) {
           orders = data['orders'];
           notifyListeners();
-          print('주문 내역: $orders'); // 확인용 출력
+
         } else {
           throw Exception('주문 정보를 찾을 수 없습니다. ${response.body}');
         }
@@ -110,10 +112,7 @@ class ProfileScreenController extends ChangeNotifier {
         throw Exception('주문 정보 가져오기 실패: ${response.body}');
       }
     } catch (e) {
-      print('오류 발생: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('주문 정보를 가져오는 데 실패했습니다.')),
-      );
+
       throw e;
     }
   }

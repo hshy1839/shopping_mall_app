@@ -52,6 +52,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: Colors.black,
+            fontSize: 18,
           ),
         ),
         centerTitle: true,
@@ -105,10 +106,10 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   border: Border.all(color: Colors.grey[300]!, width: 0.5),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1), // 그림자 색상 및 투명도
-                      blurRadius: 8.0, // 그림자 흐림 정도
-                      spreadRadius: 2.0, // 그림자 퍼짐 정도
-                      offset: Offset(0, 4), // 그림자 위치 (x, y)
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 8.0,
+                      spreadRadius: 2.0,
+                      offset: Offset(0, 4),
                     ),
                   ],
                 ),
@@ -119,7 +120,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                     children: [
                       Row(
                         children: [
-                          // 상품 이미지
                           ClipRRect(
                             borderRadius: BorderRadius.circular(8.0),
                             child: mainImageUrl.isNotEmpty
@@ -137,7 +137,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                             ),
                           ),
                           SizedBox(width: 12),
-                          // 상품 정보
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -174,8 +173,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                         ],
                       ),
                       SizedBox(height: 8),
-                      Divider(color: Colors.grey[300]), // 실선 추가
-                      // 주문 추가 정보
+                      Divider(color: Colors.grey[300]),
                       Text(
                         '결제 상태: ${order['paymentStatus'] ?? '알 수 없음'}',
                         style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
@@ -201,7 +199,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     );
   }
 
-  // 날짜 포맷 함수
   String _formatDate(String originalDate) {
     try {
       final dateTime = DateTime.parse(originalDate).toLocal();
