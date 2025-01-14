@@ -3,6 +3,7 @@ import 'package:attedance_app/views/main_activity/cart_detail_screen.dart';
 import 'package:attedance_app/views/main_activity/order_screen.dart';
 import 'package:attedance_app/views/main_activity/qna_create_screen.dart';
 import 'package:attedance_app/views/main_activity/qna_screen.dart';
+import 'package:attedance_app/views/main_activity/userinfo_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
@@ -15,6 +16,7 @@ import 'package:attedance_app/views/main_activity/main_screen.dart';
 import 'package:attedance_app/views/main_activity/notice_screen.dart';
 import 'package:attedance_app/views/main_activity/profile_screen.dart';
 import 'package:attedance_app/views/main_activity/order_detail_screen.dart';
+import 'package:attedance_app/views/main_activity/userinfo_detail_screen.dart';
 import 'footer.dart';
 import 'package:attedance_app/shopping_screen/shopping_screen.dart';
 
@@ -53,6 +55,8 @@ class MyApp extends StatelessWidget {
         return MaterialPageRoute(builder: (_) => AccountScreen());
       case '/qnaCreate':
         return MaterialPageRoute(builder: (_) => QnaCreateScreen());
+      case '/userinfo':
+        return MaterialPageRoute(builder: (_) => UserDetailScreen());
       case '/shoppingscreen':
         return MaterialPageRoute(
           builder: (_) => ShoppingScreen(categoryName: 'Selected Category'),

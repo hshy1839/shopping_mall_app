@@ -178,6 +178,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               trailing: Icon(Icons.arrow_forward_ios, size: 16.0, color: Colors.grey),
               onTap: () {
                 // 개인정보 수정 화면으로 이동
+                Navigator.pushNamed(context, '/userinfo');
               },
             ),
             Divider(color: Colors.grey[300], thickness: 1.0),
