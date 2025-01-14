@@ -1,4 +1,6 @@
+import 'package:attedance_app/views/main_activity/qna_detail_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart'; // 날짜 포맷용
 import '../../controllers/qna_controller.dart'; // QnaController 경로에 맞게 수정
 import 'notice_detail_screen.dart';
 
@@ -20,16 +22,29 @@ class _QnaScreenState extends State<QnaScreen> {
 
   Future<void> _fetchQnaQuestions() async {
     try {
-      final fetchedQuestions = await _controller.getQnaInfo(); // 토큰 기반 QnA 조회
+      final fetchedQuestions = await _controller.getQnaInfo();
+      for (var question in fetchedQuestions) {
+      }
       setState(() {
         qnaQuestions = fetchedQuestions;
-        _isLoading = false; // 로딩 완료
+        _isLoading = false;
       });
     } catch (e) {
       print('QnA 정보 조회 중 오류: $e');
       setState(() {
-        _isLoading = false; // 오류 발생 시에도 로딩 상태 해제
+        _isLoading = false;
       });
+    }
+  }
+
+
+  String _formatDate(String? dateString) {
+    if (dateString == null) return '날짜 없음';
+    try {
+      final DateTime date = DateTime.parse(dateString); // 날짜 문자열 파싱
+      return DateFormat('yyyy-MM-dd').format(date); // 원하는 형식으로 변환
+    } catch (e) {
+      return '날짜 없음'; // 오류 발생 시 기본값
     }
   }
 
@@ -64,7 +79,7 @@ class _QnaScreenState extends State<QnaScreen> {
         itemCount: qnaQuestions.length,
         itemBuilder: (context, index) {
           final question = qnaQuestions[index];
-          final hasAnswer = (question['answer'] != null && question['answer'].isNotEmpty);
+          final hasAnswer = (question['answers'] != null && question['answers'].isNotEmpty);
 
           return Column(
             children: [
@@ -78,7 +93,7 @@ class _QnaScreenState extends State<QnaScreen> {
                   ),
                 ),
                 subtitle: Text(
-                  question['createdAt'] ?? '날짜 없음',
+                  _formatDate(question['createdAt']), // 날짜 포맷 적용
                   style: TextStyle(
                     fontSize: 12.0,
                     color: Colors.grey,
@@ -96,10 +111,11 @@ class _QnaScreenState extends State<QnaScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => NoticeDetailScreen(
+                      builder: (context) => QnaDetailScreen(
                         title: question['title'] ?? '제목 없음',
-                        date: question['createdAt'] ?? '날짜 없음',
+                        date: _formatDate(question['createdAt']),
                         content: question['body'] ?? '내용 없음',
+                        questionId: question['_id'] ?? '', // questionId에 고유 ID 전달
                       ),
                     ),
                   );
@@ -119,7 +135,7 @@ class _QnaScreenState extends State<QnaScreen> {
           Navigator.pushNamed(context, '/qnaCreate');
         },
         backgroundColor: Colors.blue,
-        child: Icon(Icons.add, color: Colors.white),
+        child: Text("문의", style: TextStyle(color: Colors.white),),
       ),
     );
   }

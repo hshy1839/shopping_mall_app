@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../controllers/profile_screen_controller.dart';
+import '../../controllers/qna_controller.dart'; // QnaController 추가
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -7,33 +8,60 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  final ProfileScreenController _controller = ProfileScreenController(); // 컨트롤러 인스턴스
+  final ProfileScreenController _controller = ProfileScreenController(); // 프로필 컨트롤러 인스턴스
+  final QnaController _qnaController = QnaController(); // Qna 컨트롤러 인스턴스
+
   String username = "회원님"; // 초기 사용자 이름
-  String name = "";
+  String name = "회원"; // 초기 이름
   int orderCount = 0; // 초기 주문 내역 개수
-  final int couponCount = 3; // 쿠폰 개수
-  final int inquiryCount = 1; // 문의 개수
+  int couponCount = 3; // 쿠폰 개수
+  int inquiryCount = 0; // 문의 개수 초기화
 
   @override
   void initState() {
     super.initState();
-    fetchUserDetailsAndOrders(); // 사용자 정보와 주문 내역 가져오기
+    fetchUserDetails(); // 사용자 정보 가져오기
+    fetchUserOrders(); // 주문 내역 가져오기
+    fetchInquiryCount(); // 문의 개수 가져오기
   }
 
-  Future<void> fetchUserDetailsAndOrders() async {
+  Future<void> fetchUserDetails() async {
     try {
       // 사용자 정보 가져오기
       await _controller.fetchUserDetails(context);
-      // 주문 내역 가져오기
-      await _controller.fetchUserOrders(context);
 
       setState(() {
         username = _controller.username; // 사용자 이름 업데이트
         name = _controller.name;
+      });
+    } catch (e) {
+      print('사용자 정보를 가져오는 중 오류 발생: $e');
+    }
+  }
+
+  Future<void> fetchUserOrders() async {
+    try {
+      // 주문 내역 가져오기
+      await _controller.fetchUserOrders(context);
+
+      setState(() {
         orderCount = _controller.orders.length; // 주문 내역 개수 업데이트
       });
     } catch (e) {
-      print('데이터를 가져오는 중 오류 발생: $e');
+      print('주문 내역을 가져오는 중 오류 발생: $e');
+    }
+  }
+
+  Future<void> fetchInquiryCount() async {
+    try {
+      // QnA 문의 글 개수 가져오기
+      final qnaList = await _qnaController.getQnaInfo();
+
+      setState(() {
+        inquiryCount = qnaList.length; // 문의 글 개수 업데이트
+      });
+    } catch (e) {
+      print('문의 글 개수를 가져오는 중 오류 발생: $e');
     }
   }
 
@@ -115,7 +143,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       title: '문의',
                       count: inquiryCount,
                       onTap: () {
-                        // 문의 화면으로 이동
+                        Navigator.pushNamed(context, '/qna'); // QnA 화면으로 이동
                       },
                     ),
                   ],

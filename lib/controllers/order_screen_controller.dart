@@ -4,9 +4,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class OrderScreenController {
   // 서버 주소
-  static const String orderApiUrl = 'http://172.29.17.152:8863/api/order';
-  static const String shippingApiUrl = 'http://172.29.17.152:8863/api/shipping';
-  static const String shippingInfoApiUrl = 'http://172.29.17.152:8863/api/shippinginfo';
+  static const String orderApiUrl = 'http://172.29.19.130:8863/api/order';
+  static const String shippingApiUrl = 'http://172.29.19.130:8863/api/shipping';
+  static const String shippingInfoApiUrl = 'http://172.29.19.130:8863/api/shippinginfo';
 
   // 주문 추가 함수
   static Future<http.Response> addToOrder({
