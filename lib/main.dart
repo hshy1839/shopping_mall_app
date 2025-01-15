@@ -150,7 +150,7 @@ class _MainScreenWithFooterState extends State<MainScreenWithFooter> {
 
   final List<Widget> _pages = [
     MainScreen(),
-    CategoryScreen(),
+    QnaScreen(),
     OrderDetailScreen(), // 로그인 화면을 추가하여 리디렉션 처리
     ProfileScreen(),
   ];

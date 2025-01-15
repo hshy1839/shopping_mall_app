@@ -64,12 +64,7 @@ class _QnaScreenState extends State<QnaScreen> {
         backgroundColor: Colors.white,
         centerTitle: true,
         elevation: 0.5,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+
       ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator()) // 로딩 중일 때 표시

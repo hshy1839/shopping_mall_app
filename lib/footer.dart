@@ -24,10 +24,11 @@ class Footer extends StatelessWidget {
 
           _buildFooterItem(
             context,
-            icon: Icons.menu_outlined,
-            label: '카테고리',
+            icon: Icons.back_hand_outlined,
+            label: '1:1 문의',
             index: 1,
           ),
+
           // 구매내역 탭
           _buildFooterItem(
             context,

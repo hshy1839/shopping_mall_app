@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../controllers/profile_screen_controller.dart';
+import '../../controllers/cart_controller.dart';
 import '../../controllers/qna_controller.dart'; // QnaController 추가
 
 class ProfileScreen extends StatefulWidget {
@@ -10,11 +12,12 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   final ProfileScreenController _controller = ProfileScreenController(); // 프로필 컨트롤러 인스턴스
   final QnaController _qnaController = QnaController(); // Qna 컨트롤러 인스턴스
+  final CartController _cartController = CartController(); // 장바구니 컨트롤러 인스턴스
 
   String username = "회원님"; // 초기 사용자 이름
   String name = "회원"; // 초기 이름
   int orderCount = 0; // 초기 주문 내역 개수
-  int couponCount = 3; // 쿠폰 개수
+  int cartCount = 0; // 장바구니 항목 개수
   int inquiryCount = 0; // 문의 개수 초기화
 
   @override
@@ -22,6 +25,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.initState();
     fetchUserDetails(); // 사용자 정보 가져오기
     fetchUserOrders(); // 주문 내역 가져오기
+    fetchCartItems(); // 장바구니 항목 개수 가져오기
     fetchInquiryCount(); // 문의 개수 가져오기
   }
 
@@ -51,6 +55,48 @@ class _ProfileScreenState extends State<ProfileScreen> {
       print('주문 내역을 가져오는 중 오류 발생: $e');
     }
   }
+
+  Future<void> fetchCartItems() async {
+    try {
+      final String token = await _getToken();
+
+      // userId를 SharedPreferences에서 가져오기
+      final prefs = await SharedPreferences.getInstance();
+      String? userId = prefs.getString('userId');
+
+      // userId가 없는 경우 서버에서 가져오기
+      if (userId == null || userId.isEmpty) {
+        final profileController = ProfileScreenController();
+        await profileController.fetchUserId(context);
+        userId = profileController.userId;
+
+        if (userId.isEmpty) {
+          throw Exception('userId를 가져올 수 없습니다.');
+        }
+
+        // SharedPreferences에 userId 저장
+        await prefs.setString('userId', userId);
+      }
+
+      if (token.isEmpty) {
+        throw Exception('로그인 토큰이 없습니다.');
+      }
+
+      final cartItems = await _cartController.fetchCartData(userId, token);
+
+      setState(() {
+        cartCount = cartItems.length; // 장바구니 항목 개수 업데이트
+      });
+    } catch (e) {
+      print('장바구니 항목 개수를 가져오는 중 오류 발생: $e');
+    }
+  }
+
+  Future<String> _getToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('token') ?? '';
+  }
+
 
   Future<void> fetchInquiryCount() async {
     try {
@@ -112,7 +158,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
             SizedBox(height: 10.0),
-            // 쿠폰, 주문내역, 나의 리뷰, 문의 (하나의 사각형으로 묶음)
+            // 장바구니, 주문내역, 문의 (하나의 사각형으로 묶음)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
               child: Container(
@@ -126,17 +172,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     _buildStatItem(
                       context,
-                      title: '쿠폰',
-                      count: couponCount,
+                      title: '장바구니',
+                      count: cartCount, // 장바구니 항목 개수
                       onTap: () {
-                        // 쿠폰 화면으로 이동
+                        Navigator.pushNamed(context, '/cart'); // 장바구니 화면으로 이동
                       },
                     ),
                     _buildStatItem(
                       context,
                       title: '주문내역',
                       count: orderCount,
-                      onTap: null, // 클릭 시 아무 동작도 하지 않도록 설정
+                      onTap: () {
+                        Navigator.pushNamed(context, '/orders'); // 주문 내역 화면으로 이동
+                      },
                     ),
                     _buildStatItem(
                       context,
@@ -165,7 +213,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Divider(color: Colors.grey[300], thickness: 1.0),
             ListTile(
               title: Text('1:1 문의', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
-              leading: Icon(Icons.back_hand_outlined, color: Colors.grey), // 공지사항 아이콘
+              leading: Icon(Icons.back_hand_outlined, color: Colors.grey), // 문의 아이콘
               trailing: Icon(Icons.arrow_forward_ios, size: 16.0, color: Colors.grey),
               onTap: () {
                 Navigator.pushNamed(context, '/qna');
@@ -177,21 +225,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
               leading: Icon(Icons.person_outline, color: Colors.grey), // 개인정보 수정 아이콘
               trailing: Icon(Icons.arrow_forward_ios, size: 16.0, color: Colors.grey),
               onTap: () {
-                // 개인정보 수정 화면으로 이동
-                Navigator.pushNamed(context, '/userinfo');
+                Navigator.pushNamed(context, '/userinfo'); // 개인정보 수정 화면으로 이동
               },
             ),
             Divider(color: Colors.grey[300], thickness: 1.0),
             ListTile(
-              title: Text('결제 계좌 정보', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
-              leading: Icon(Icons.call, color: Colors.grey), // 고객센터 아이콘
+              title: Text('로그아웃', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
+              leading: Icon(Icons.logout, color: Colors.grey),
               trailing: Icon(Icons.arrow_forward_ios, size: 16.0, color: Colors.grey),
-              onTap: () {
-                // 고객센터 화면으로 이동
-                Navigator.pushNamed(context, '/accountInfo');
-              },
+              onTap: () => _controller.logout(context), // 로그아웃 함수 호출
             ),
-
           ],
         ),
       ),
