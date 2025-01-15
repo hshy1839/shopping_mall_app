@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../../controllers/order_screen_controller.dart'; // OrderScreenController를 import
 import '../../controllers/product_controller.dart';
@@ -23,6 +24,11 @@ class _OrderScreenState extends State<OrderScreen> {
   Map<String, dynamic>? productInfo;
   bool isLoading = true;
   String? address; // 배송지 정보
+  String code = ''; // 쿠폰 코드
+  int discountAmount = 0; // 할인 금액
+  bool isCouponValid = false; // 쿠폰 유효성
+  String? couponName;
+  String? discountType;
 
   @override
   void initState() {
@@ -53,13 +59,56 @@ class _OrderScreenState extends State<OrderScreen> {
       if (shippingInfo.containsKey('shipping')) {
         final shippingAddress = shippingInfo['shipping']['shippingAddress'];
         setState(() {
-          address = shippingAddress['address'] ?? ''; // 배송지 설정
+          address = shippingAddress['address'] ?? '';
         });
       }
     } catch (e) {
       print('기존 배송 정보 로드 실패: $e');
     }
   }
+
+  Future<void> applyCoupon() async {
+    if (code.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('쿠폰 코드를 입력하세요.')),
+      );
+      return;
+    }
+
+    try {
+      final response = await OrderScreenController.verifyCoupon(code);
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        setState(() {
+          discountAmount = data['discountValue'];
+          isCouponValid = true;
+          // 추가로 쿠폰 정보를 상태에 저장
+          couponName = data['name'] ?? '';
+          discountType = data['discountType'] ?? '';
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('쿠폰이 적용되었습니다!')),
+        );
+      } else {
+        setState(() {
+          discountAmount = 0;
+          isCouponValid = false;
+          couponName = '';
+          discountType = '';
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('유효하지 않은 쿠폰 코드입니다.')),
+        );
+      }
+    } catch (e) {
+      print('쿠폰 검증 중 오류 발생: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('쿠폰 검증 중 오류가 발생했습니다.')),
+      );
+    }
+  }
+
+
   Future<void> _handleOrderSubmission() async {
     if (address == null || address!.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -69,7 +118,6 @@ class _OrderScreenState extends State<OrderScreen> {
     }
 
     try {
-      // 주문 데이터 생성
       final List<Map<String, dynamic>> items = [
         {
           'productId': widget.productId,
@@ -80,22 +128,14 @@ class _OrderScreenState extends State<OrderScreen> {
         }
       ];
 
-      final List<Map<String, dynamic>> account = [
-        {
-          'accountName': '홍길동', // 예시 데이터
-          'accountNumber': '123-456-7890', // 예시 데이터
-        }
-      ];
-
-      // 서버로 데이터 전송
       final response = await OrderScreenController.addToOrder(
-        account: account,
+        account: [],
         items: items,
-        totalAmount: widget.totalAmount.toDouble(),
+        totalAmount: (widget.totalAmount - discountAmount).toDouble(),
         address: address!,
       );
 
-      if (response.statusCode == 201 ) {
+      if (response.statusCode == 201) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('주문이 성공적으로 완료되었습니다.')),
         );
@@ -141,12 +181,12 @@ class _OrderScreenState extends State<OrderScreen> {
               Divider(thickness: 1),
               _buildProductRow(productInfo!),
               Divider(thickness: 1),
-              _buildClickableRow('배송지 정보', '입력하기'),
+              _buildClickableRow('배송지 정보', '확인'),
               Divider(thickness: 1),
-              _buildSectionTitle('쿠폰 / 포인트'),
-              _buildCouponRow(),
+              _buildSectionTitle('쿠폰'),
+              _buildCouponInputRow(),
               Divider(thickness: 1),
-              _buildPriceDetails(widget.totalAmount),
+              _buildPriceDetails(widget.totalAmount - discountAmount),
               Divider(thickness: 1),
               SizedBox(height: 30),
               _buildPayButton(),
@@ -157,20 +197,88 @@ class _OrderScreenState extends State<OrderScreen> {
     );
   }
 
+  Widget _buildCouponInputRow() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: TextField(
+                decoration: InputDecoration(
+                  labelText: '쿠폰 코드 입력',
+                  border: OutlineInputBorder(),
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    code = value;
+                  });
+                },
+              ),
+            ),
+            SizedBox(width: 10),
+            ElevatedButton(
+              onPressed: applyCoupon,
+              child: Text('적용'),
+            ),
+          ],
+        ),
+        SizedBox(height: 10),
+        if (isCouponValid) // 쿠폰이 유효한 경우에만 표시
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '쿠폰 이름: $couponName',
+                style: TextStyle(fontSize: 16, color: Colors.black),
+              ),
+              Text(
+                '할인 금액: ${discountType == 'percentage' ? '$discountAmount%' : '₩$discountAmount'}',
+                style: TextStyle(fontSize: 16, color: Colors.black),
+              ),
+            ],
+          ),
+      ],
+    );
+  }
+
+
+
   Widget _buildPayButton() {
+    // 할인 금액 계산
+    final int discountedAmount = discountType == 'percentage'
+        ? (widget.totalAmount * (1 - discountAmount / 100)).toInt() // percentage 계산
+        : widget.totalAmount - discountAmount; // fixed 금액 계산
+
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: _handleOrderSubmission, // 결제 버튼 클릭 시 _handleOrderSubmission 호출
+        onPressed: _handleOrderSubmission,
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.red,
           padding: EdgeInsets.symmetric(vertical: 15),
         ),
         child: Text(
-          '₩ ${widget.totalAmount} 결제하기',
+          '₩ $discountedAmount 결제하기',
           style: TextStyle(color: Colors.white, fontSize: 16),
         ),
       ),
+    );
+  }
+
+  Widget _buildPriceDetails(int totalAmount) {
+    // 할인 금액 계산
+    final int discountedAmount = discountType == 'percentage'
+        ? (widget.totalAmount * (1 - (discountAmount.clamp(0, 100) / 100))).toInt() // 백분율을 0~100으로 제한
+        : (widget.totalAmount - discountAmount).clamp(0, widget.totalAmount).toInt(); // 고정 금액이 총 금액보다 크지 않도록 제한
+
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text('총 금액:'),
+        Text('₩ $discountedAmount'),
+      ],
     );
   }
 
@@ -391,13 +499,5 @@ class _OrderScreenState extends State<OrderScreen> {
     );
   }
 
-  Widget _buildPriceDetails(int totalAmount) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text('총 금액:'),
-        Text('₩ $totalAmount'),
-      ],
-    );
-  }
+
 }

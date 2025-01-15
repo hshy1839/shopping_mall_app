@@ -36,7 +36,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   SizedBox(height: 30),
                   Text(
-                    'Shopping',
+                    'Alice',
                     style: TextStyle(color: Colors.black, fontSize: 50, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 30),

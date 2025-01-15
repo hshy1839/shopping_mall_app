@@ -4,9 +4,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class OrderScreenController {
   // 서버 주소
-  static const String orderApiUrl = 'http://172.29.19.130:8863/api/order';
-  static const String shippingApiUrl = 'http://172.29.19.130:8863/api/shipping';
-  static const String shippingInfoApiUrl = 'http://172.29.19.130:8863/api/shippinginfo';
+  static const String orderApiUrl = 'http://172.30.49.11:8863/api/order';
+  static const String shippingApiUrl = 'http://172.30.49.11:8863/api/shipping';
+  static const String shippingInfoApiUrl = 'http://172.30.49.11:8863/api/shippinginfo';
 
   // 주문 추가 함수
   static Future<http.Response> addToOrder({
@@ -79,6 +79,23 @@ class OrderScreenController {
       throw Exception('Failed to add shipping: $e');
     }
   }
+
+  // controllers/order_screen_controller.dart
+  static Future<http.Response> verifyCoupon(String code) async {
+    final url = Uri.parse('http://172.30.49.11:8863/api/verifyCoupon?code=$code');
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? ''; // 토큰 불러오기
+
+    return await http.get(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token', // 서버에서 인증을 요구한다면 토큰 추가
+      },
+    );
+  }
+
+
 
   // 배송 정보 가져오기 함수
   static Future<Map<String, dynamic>> getShipping() async {
