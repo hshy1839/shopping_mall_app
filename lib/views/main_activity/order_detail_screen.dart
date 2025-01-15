@@ -12,6 +12,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   final ProductController _productController = ProductController();
   bool isLoading = true;
 
+  int currentPage = 0; // 현재 페이지
+  int itemsPerPage = 5; // 페이지당 아이템 수
+
   @override
   void initState() {
     super.initState();
@@ -21,7 +24,15 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   Future<void> fetchOrders() async {
     try {
       await _controller.fetchUserOrders(context); // 주문 데이터를 가져옵니다.
+
       setState(() {
+        // 데이터를 최신순에서 오래된 순으로 정렬
+        _controller.orders.sort((a, b) {
+          final dateA = DateTime.parse(a['createdAt']);
+          final dateB = DateTime.parse(b['createdAt']);
+          return dateB.compareTo(dateA); // 내림차순 정렬
+        });
+
         isLoading = false; // 로딩 상태를 false로 설정
       });
     } catch (e) {
@@ -31,6 +42,24 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       });
     }
   }
+
+  List<Map<String, dynamic>> getOrdersForPage() {
+    final totalOrders = _controller.orders.length;
+    final totalPages = (totalOrders / itemsPerPage).ceil();
+
+    // 마지막 페이지부터 5개씩 슬라이싱
+    final start = totalOrders - (currentPage + 1) * itemsPerPage;
+    final end = totalOrders - currentPage * itemsPerPage;
+
+    // 범위가 초과되지 않도록 조정하고 타입을 명시적으로 변환
+    return _controller.orders
+        .sublist(
+      start < 0 ? 0 : start,
+      end > totalOrders ? totalOrders : end,
+    )
+        .cast<Map<String, dynamic>>(); // 타입 변환 추가
+  }
+
 
   Future<String> fetchMainImage(String productId) async {
     try {
@@ -44,6 +73,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final totalOrders = _controller.orders.length;
+    final totalPages = (totalOrders / itemsPerPage).ceil();
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -73,20 +105,25 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           ),
         ),
       )
-          : Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ListView.builder(
-          itemCount: _controller.orders.length,
-          itemBuilder: (context, index) {
-            final order = _controller.orders[index];
-            return _buildOrderItem(order);
-          },
-        ),
+          : Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              itemCount: getOrdersForPage().length,
+              itemBuilder: (context, index) {
+                final order = getOrdersForPage()[index];
+                return _buildOrderItem(order);
+              },
+            ),
+          ),
+          _buildPaginationControls(totalPages),
+        ],
       ),
     );
   }
 
   Widget _buildOrderItem(Map<String, dynamic> order) {
+    // 기존 _buildOrderItem 코드 재사용
     final items = order['items'] as List<dynamic>? ?? [];
     final formattedDate = _formatDate(order['createdAt'] ?? '');
 
@@ -195,6 +232,35 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             },
           ),
         SizedBox(height: 16),
+      ],
+    );
+  }
+
+  Widget _buildPaginationControls(int totalPages) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: currentPage < totalPages - 1
+              ? () {
+            setState(() {
+              currentPage++;
+            });
+          }
+              : null,
+        ),
+        Text('${totalPages - currentPage} / $totalPages'),
+        IconButton(
+          icon: Icon(Icons.arrow_forward),
+          onPressed: currentPage > 0
+              ? () {
+            setState(() {
+              currentPage--;
+            });
+          }
+              : null,
+        ),
       ],
     );
   }
