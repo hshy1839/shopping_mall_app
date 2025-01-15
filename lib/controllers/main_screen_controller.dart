@@ -10,6 +10,7 @@ class MainScreenController extends ChangeNotifier {
   List<String> contents = []; // 공지 내용을 저장할 리스트
   List<String> authorNames = []; // 작성자 이름을 저장할 리스트
   List<String> createdAts = []; // 작성일을 저장할 리스트
+  List<String> promotionImages = []; // 프로모션 이미지 URL을 저장할 리스트
 
   void onTabTapped(int index) {
     selectedIndex = index;
@@ -19,13 +20,7 @@ class MainScreenController extends ChangeNotifier {
   Future<void> getNotices() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
-    final currentDate = DateTime.utc(DateTime
-        .now()
-        .year, DateTime
-        .now()
-        .month, DateTime
-        .now()
-        .day).toIso8601String();
+    final currentDate = DateTime.utc(DateTime.now().year, DateTime.now().month, DateTime.now().day).toIso8601String();
 
     final url = 'http://172.30.49.11:8863/api/users/noticeList/find';
     final headers = {
@@ -65,9 +60,6 @@ class MainScreenController extends ChangeNotifier {
             contents.add(noticeContent);
             authorNames.add(noticeAuthorName);
             createdAts.add(noticeCreatedAt);
-
-            // 원하는 곳에 공지사항 정보 출력
-
           }
         }
       }
@@ -77,4 +69,60 @@ class MainScreenController extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+
+
+  Future<List<Map<String, dynamic>>> getPromotions() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token') ?? ''; // 저장된 토큰 불러오기
+
+      if (token.isEmpty) {
+        throw Exception('토큰이 없습니다. 로그인 상태를 확인하세요.');
+      }
+
+      final response = await http.get(
+        Uri.parse('http://172.30.49.11:8863/api/promotion/read'),
+        headers: {
+          'Authorization': 'Bearer $token', // Bearer 토큰 추가
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final decodedResponse = json.decode(response.body);
+
+        // 데이터 유효성 검사 및 리스트 처리
+        if (decodedResponse is Map<String, dynamic> &&
+            decodedResponse['promotions'] is List<dynamic>) {
+          final promotions = decodedResponse['promotions'] as List<dynamic>;
+          const serverUrl = 'http://172.30.49.11:8863';
+
+          // 프로모션 리스트 처리
+          return promotions.map((promotion) {
+            final promotionMap = promotion as Map<String, dynamic>;
+            final promotionImage = promotionMap['promotionImage'] as List<dynamic>?;
+
+            return {
+              'id': promotionMap['_id'] ?? '',
+              'name': promotionMap['name']?.toString() ?? '',
+              'promotionImageUrl': promotionImage != null && promotionImage.isNotEmpty
+                  ? '$serverUrl${promotionImage[0]}'
+                  : '', // 이미지 URL 생성
+            };
+          }).toList();
+        } else {
+          print('Unexpected data format: $decodedResponse');
+          return []; // 예상과 다른 응답 데이터일 경우 빈 리스트 반환
+        }
+      } else {
+        print('API 호출 실패: ${response.statusCode}, ${response.body}');
+        return []; // 실패 시 빈 리스트 반환
+      }
+    } catch (error) {
+      print('제품 이미지 조회 중 오류 발생: $error');
+      return []; // 오류 발생 시 빈 리스트 반환
+    }
+  }
+
+
 }

@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import '../../controllers/main_screen_controller.dart';
 import '../../controllers/notice_screen_controller.dart';
 import '../../footer.dart';
 import '../../header.dart';
@@ -17,6 +18,57 @@ class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
   List<Map<String, String>> notices = []; // 공지사항 리스트
   List<Map<String, String>> products = [];
+  List<String> ads = []; // 서버에서 가져온 광고 이미지 URL 리스트
+
+  final List<Map<String, String>> categories = [
+    {'name': '남성의류', 'icon': 'assets/icons/cloth_man.png'},
+    {'name': '여성의류', 'icon': 'assets/icons/cloth_woman.png'},
+    {'name': '골프의류', 'icon': 'assets/icons/outer.png'},
+    {'name': '일반의류', 'icon': 'assets/icons/top.png'},
+    {'name': '기타', 'icon': 'assets/icons/pants.png'},
+    {'name': '지갑', 'icon': 'assets/icons/cap.png'},
+    {'name': '가방', 'icon': 'assets/icons/bag.png'},
+    {'name': '신발', 'icon': 'assets/icons/shoes.png'},
+    {'name': '골프가방', 'icon': 'assets/icons/bag.png'},
+    {'name': '골프신발', 'icon': 'assets/icons/shoes.png'},
+  ];
+
+  ScrollController _scrollController = ScrollController();
+  bool _isHeaderVisible = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadNotices();
+    _loadProducts();
+    _loadAds(); // 광고 이미지 불러오기
+    _scrollController.addListener(_scrollListener);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_scrollListener);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  // 광고 이미지 불러오기
+  Future<void> _loadAds() async {
+    try {
+      MainScreenController controller = MainScreenController();
+      List<Map<String, dynamic>> promotions = await controller.getPromotions();
+
+      setState(() {
+        ads = promotions
+            .map((promotion) => promotion['promotionImageUrl'] ?? '')
+            .toList()
+            .cast<String>(); // 명시적으로 String 리스트로 변환
+      });
+    } catch (e) {
+      print('Error loading ads: $e');
+    }
+  }
+
 
   // 공지사항 불러오기
   Future<void> _loadNotices() async {
@@ -36,54 +88,8 @@ class _MainScreenState extends State<MainScreen> {
         products = fetchedProducts;
       });
     } catch (e) {
-      // 데이터를 불러오지 못했을 때 콘솔에 오류 메시지 출력
       print('Error loading products: $e');
     }
-  }
-
-
-  void _onTabTapped(int index) {
-    setState(() {
-      _selectedIndex = index; // 탭 변경 시 인덱스를 업데이트
-    });
-  }
-
-  final List<Map<String, String>> categories = [
-    {'name': '남성의류', 'icon': 'assets/icons/cloth_man.png'},
-    {'name': '여성의류', 'icon': 'assets/icons/cloth_woman.png'},
-    {'name': '골프의류', 'icon': 'assets/icons/outer.png'},
-    {'name': '일반의류', 'icon': 'assets/icons/top.png'},
-    {'name': '기타', 'icon': 'assets/icons/pants.png'},
-    {'name': '지갑', 'icon': 'assets/icons/cap.png'},
-    {'name': '가방', 'icon': 'assets/icons/bag.png'},
-    {'name': '신발', 'icon': 'assets/icons/shoes.png'},
-    {'name': '골프가방', 'icon': 'assets/icons/bag.png'},
-    {'name': '골프신발', 'icon': 'assets/icons/shoes.png'},
-  ];
-
-  final List<String> ads = [
-    'assets/images/image1.png',
-    'assets/images/nike2.png',
-    'assets/images/nike3.png',
-  ];
-
-  ScrollController _scrollController = ScrollController();
-  bool _isHeaderVisible = true;
-
-
-  @override
-  void initState() {
-    super.initState();
-    _loadNotices();
-    _loadProducts();
-    _scrollController.addListener(_scrollListener);
-  }
-
-  @override
-  void dispose() {
-    _scrollController.removeListener(_scrollListener);
-    _scrollController.dispose();
-    super.dispose();
   }
 
   void _scrollListener() {
@@ -102,32 +108,30 @@ class _MainScreenState extends State<MainScreen> {
     }
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: CustomScrollView(
         slivers: [
-          // Header는 _isHeaderVisible 값에 따라 보이거나 숨깁니다.
           if (_isHeaderVisible) SliverToBoxAdapter(child: Header()),
 
           // 광고 슬라이더
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.only(top: 20.0, bottom: 20.0), // ads 섹션 위쪽 여백 추가
-              child: CarouselSlider(
-                items: ads.map((ad) {
+              padding: const EdgeInsets.only(top: 20.0, bottom: 20.0),
+              child: ads.isNotEmpty
+                  ? CarouselSlider(
+                items: ads.map((adUrl) {
                   return Builder(
                     builder: (BuildContext context) {
                       return Container(
                         width: MediaQuery.of(context).size.width,
-                        margin: EdgeInsets.symmetric(horizontal: 0.0),
+                        margin: EdgeInsets.symmetric(horizontal: 5.0),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8.0),
                           image: DecorationImage(
-                            image: AssetImage(ad),
+                            image: NetworkImage(adUrl),
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -143,10 +147,13 @@ class _MainScreenState extends State<MainScreen> {
                   aspectRatio: 2.0,
                   onPageChanged: (index, reason) {},
                 ),
-              ),
+              )
+                  : Center(child: CircularProgressIndicator()),
             ),
           ),
 
+
+          // 공지사항
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 1.0, horizontal: 16.0),
@@ -207,39 +214,37 @@ class _MainScreenState extends State<MainScreen> {
             ),
           ),
 
-
-          // 아이콘과 함께 배치된 카테고리
-          // 수정된 카테고리 위젯
+          // 카테고리
           SliverToBoxAdapter(
             child: Container(
               padding: EdgeInsets.only(top: 30.0, left: 8.0, right: 8.0),
               child: Wrap(
-                alignment: WrapAlignment.center, // 가운데 정렬
-                spacing: 10.0, // 아이템 간의 간격
-                runSpacing: 16.0, // 행 간의 간격
+                alignment: WrapAlignment.center,
+                spacing: 10.0,
+                runSpacing: 16.0,
                 children: categories.map((category) {
                   return GestureDetector(
                     onTap: () {
                       Navigator.pushNamed(
                         context,
                         '/shoppingscreen',
-                        arguments: category['name'], // 카테고리 이름 전달
+                        arguments: category['name'],
                       );
                     },
                     child: Container(
-                      width: (MediaQuery.of(context).size.width - 40) / 5, // 한 행에 5개 아이템 배치
+                      width: (MediaQuery.of(context).size.width - 40) / 5,
                       child: Column(
                         children: [
                           Image.asset(
                             category['icon']!,
-                            width: 25, // 아이콘 크기 조정
-                            height: 25, // 아이콘 크기 조정
+                            width: 25,
+                            height: 25,
                           ),
                           SizedBox(height: 8),
                           Text(
                             category['name']!,
                             style: TextStyle(fontWeight: FontWeight.bold),
-                            textAlign: TextAlign.center, // 텍스트 중앙 정렬
+                            textAlign: TextAlign.center,
                           ),
                         ],
                       ),
@@ -250,33 +255,7 @@ class _MainScreenState extends State<MainScreen> {
             ),
           ),
 
-
-          // 추천 상품 섹션
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 26.0, horizontal: 20.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border(
-                    top: BorderSide(color: Color(0xFFB0B0B0), width: 1.0), // 위 경계선 설정
-                  ),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 30.0), // 경계선과 텍스트 사이의 간격
-                  child: Text(
-                    '전체 상품',
-                    style: TextStyle(
-                      fontSize: 20.0,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-
-
+          // 추천 상품
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             sliver: SliverGrid(
@@ -289,83 +268,78 @@ class _MainScreenState extends State<MainScreen> {
               delegate: SliverChildBuilderDelegate(
                     (context, index) {
                   final product = products[index];
-
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 0.0),
-                    child: GestureDetector(
-                      onTap: () {
-                        // 상품 상세 화면으로 이동, productId와 product를 넘김
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ProductDetailScreen(
-                              product: product,
-                              productId: product['id'] ?? '',  // productId 전달
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ProductDetailScreen(
+                            product: product,
+                            productId: product['id'] ?? '',
+                          ),
+                        ),
+                      );
+                    },
+                    child: Card(
+                      color: Colors.white,
+                      elevation: 0,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8.0),
+                              child: Image.network(
+                                product['mainImageUrl'] ?? 'assets/images/nike1.png',
+                                fit: BoxFit.cover,
+                                height: 200,
+                                width: double.infinity,
+                                loadingBuilder: (context, child, loadingProgress) {
+                                  if (loadingProgress == null) {
+                                    return child;
+                                  }
+                                  return Center(child: CircularProgressIndicator());
+                                },
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Center(child: Icon(Icons.error));
+                                },
+                              ),
                             ),
                           ),
-                        );
-                      },
-                      child: Card(
-                        color: Colors.white,
-                        elevation: 0,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(8.0),
-                                child: Image.network(
-                                  product['mainImageUrl'] ?? 'assets/images/nike1.png',
-                                  fit: BoxFit.cover,
-                                  height: 200,
-                                  width: double.infinity,
-                                  loadingBuilder: (context, child, loadingProgress) {
-                                    if (loadingProgress == null) {
-                                      return child;
-                                    }
-                                    return Center(child: CircularProgressIndicator());
-                                  },
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Center(child: Icon(Icons.error));
-                                  },
-                                ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 4.0),
+                            child: Text(
+                              '₩ ${product['price'] ?? '상품 가격'}',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                                fontSize: 18,
                               ),
                             ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 4.0),
-                              child: Text(
-                                '₩ ${product['price'] ?? '상품 가격'}',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                  fontSize: 18,
-                                ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 4.0),
+                            child: Text(
+                              product['category'] ?? '카테고리',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                                fontSize: 14,
                               ),
                             ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 4.0),
-                              child: Text(
-                                product['category'] ?? '카테고리',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                  fontSize: 14,
-                                ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 0.0),
+                            child: Text(
+                              product['name'] ?? '상품 제목',
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 0.0),
-                              child: Text(
-                                product['name'] ?? '상품 제목',
-                                style: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   );
@@ -373,20 +347,9 @@ class _MainScreenState extends State<MainScreen> {
                 childCount: products.length,
               ),
             ),
-          )
-
-
+          ),
         ],
       ),
     );
   }
 }
-
-//<a href="https://kr.freepik.com/search">kmg design 제작 아이콘</a>
-//<a href="https://kr.freepik.com/search">Freepik 제작 아이콘</a>
-//<a href="https://kr.freepik.com/search">Freepik 제작 아이콘</a>
-//<a href="https://kr.freepik.com/search">LAFS 제작 아이콘</a>
-//<a href="https://kr.freepik.com/search">Freepik 제작 아이콘</a>
-//<a href="https://kr.freepik.com/search">Mihimihi 제작 아이콘</a>
-//<a href="https://kr.freepik.com/search">Pixel perfect 제작 아이콘</a>
-//<a href="https://kr.freepik.com/search">graphicmall 제작 아이콘</a>
