@@ -3,6 +3,7 @@ import 'package:attedance_app/views/main_activity/cart_detail_screen.dart';
 import 'package:attedance_app/views/main_activity/order_screen.dart';
 import 'package:attedance_app/views/main_activity/qna_create_screen.dart';
 import 'package:attedance_app/views/main_activity/qna_screen.dart';
+import 'package:attedance_app/views/main_activity/search_product_screen.dart';
 import 'package:attedance_app/views/main_activity/userinfo_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -57,6 +58,15 @@ class MyApp extends StatelessWidget {
         return MaterialPageRoute(builder: (_) => QnaCreateScreen());
       case '/userinfo':
         return MaterialPageRoute(builder: (_) => UserDetailScreen());
+      case '/searchProduct':
+        final args = settings.arguments as Map<String, String>?; // arguments 받기
+        print("검색어 전달 확인: ${args?['query']}"); // 검색어 로그 출력
+        return MaterialPageRoute(
+          builder: (context) => SearchProductScreen(
+            searchQuery: args?['query'] ?? '', // 검색어 전달
+          ),
+        );
+
       case '/shoppingscreen':
         return MaterialPageRoute(
           builder: (_) => ShoppingScreen(categoryName: 'Selected Category'),

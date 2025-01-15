@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class Header extends StatelessWidget {
+  final TextEditingController _searchController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -44,6 +46,7 @@ class Header extends StatelessWidget {
                   children: [
                     Expanded(
                       child: TextField(
+                        controller: _searchController,
                         decoration: InputDecoration(
                           hintText: '검색어를 입력하세요',
                           hintStyle: TextStyle(color: Colors.grey),
@@ -60,7 +63,28 @@ class Header extends StatelessWidget {
                             borderRadius: BorderRadius.circular(10.0),
                             borderSide: BorderSide.none, // 포커스 상태에서도 테두리 제거
                           ),
-                          suffixIcon: Icon(Icons.search, color: Colors.grey), // 검색 아이콘을 우측에 배치
+                          suffixIcon: IconButton(
+                            icon: Icon(Icons.search, color: Colors.grey),
+                            onPressed: () {
+                              // 검색어 가져오기
+                              final searchQuery = _searchController.text.trim();
+
+                              if (searchQuery.isNotEmpty) {
+                                // 검색 페이지로 이동
+                                Navigator.pushNamed(
+                                  context,
+                                  '/searchProduct',
+                                  arguments: {'query': _searchController.text.trim()}, // 검색어 전달
+                                );
+                                print("보낸 메시지 :${searchQuery}");
+                              } else {
+                                // 검색어가 비어있으면 메시지 표시
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('검색어를 입력해주세요.')),
+                                );
+                              }
+                            },
+                          ),
                           filled: true,
                           fillColor: Colors.grey[200],
                         ),

@@ -56,6 +56,7 @@ class _MainScreenState extends State<MainScreen> {
     {'name': '기타', 'icon': 'assets/icons/pants.png'},
     {'name': '지갑', 'icon': 'assets/icons/cap.png'},
     {'name': '가방', 'icon': 'assets/icons/bag.png'},
+    {'name': '신발', 'icon': 'assets/icons/shoes.png'},
     {'name': '골프가방', 'icon': 'assets/icons/bag.png'},
     {'name': '골프신발', 'icon': 'assets/icons/shoes.png'},
   ];
