@@ -315,6 +315,19 @@ class _ProductOptionsBottomSheetState extends State<ProductOptionsBottomSheet> {
                     });
                   },
                 ),
+                _SizeOptionButton(
+                  size: 'free',
+                  isSelected: sizeQuantity.containsKey('free'),
+                  onTap: () {
+                    setState(() {
+                      if (sizeQuantity.containsKey('free')) {
+                        sizeQuantity.remove('free');
+                      } else {
+                        sizeQuantity['free'] = 1;
+                      }
+                    });
+                  },
+                ),
               ],
             ),
             SizedBox(height: 12),

@@ -9,7 +9,7 @@ class LoginController {
   LoginController(this.context);
 
   Future<void> login(String username, String password) async {
-    final url = Uri.parse('http://172.30.49.11:8863/api/users/login');
+    final url = Uri.parse('http://172.30.1.49:8865/api/users/login');
 
     final response = await http.post(
       url,

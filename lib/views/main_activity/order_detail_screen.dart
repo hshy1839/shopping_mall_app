@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../../controllers/profile_screen_controller.dart';
 import '../../controllers/product_controller.dart';
 
@@ -14,6 +15,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 
   int currentPage = 0; // 현재 페이지
   int itemsPerPage = 5; // 페이지당 아이템 수
+  final NumberFormat currencyFormat = NumberFormat('#,###');
 
   @override
   void initState() {
@@ -45,21 +47,19 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 
   List<Map<String, dynamic>> getOrdersForPage() {
     final totalOrders = _controller.orders.length;
-    final totalPages = (totalOrders / itemsPerPage).ceil();
 
     // 마지막 페이지부터 5개씩 슬라이싱
     final start = totalOrders - (currentPage + 1) * itemsPerPage;
     final end = totalOrders - currentPage * itemsPerPage;
 
-    // 범위가 초과되지 않도록 조정하고 타입을 명시적으로 변환
+    // 범위가 초과되지 않도록 조정하고 타입을 변환
     return _controller.orders
         .sublist(
       start < 0 ? 0 : start,
       end > totalOrders ? totalOrders : end,
     )
-        .cast<Map<String, dynamic>>(); // 타입 변환 추가
+        .cast<Map<String, dynamic>>(); // 명시적으로 타입 변환
   }
-
 
   Future<String> fetchMainImage(String productId) async {
     try {
@@ -123,7 +123,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   }
 
   Widget _buildOrderItem(Map<String, dynamic> order) {
-    // 기존 _buildOrderItem 코드 재사용
     final items = order['items'] as List<dynamic>? ?? [];
     final formattedDate = _formatDate(order['createdAt'] ?? '');
 
@@ -198,7 +197,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                 ),
                                 SizedBox(height: 8),
                                 Text(
-                                  '총 ${item['totalPrice'] ?? 0} 원',
+                                  '총 ${currencyFormat.format(order['totalAmount'] ?? 0)} 원', // 쉼표 포맷 적용
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
@@ -242,21 +241,21 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       children: [
         IconButton(
           icon: Icon(Icons.arrow_back),
-          onPressed: currentPage < totalPages - 1
-              ? () {
-            setState(() {
-              currentPage++;
-            });
-          }
-              : null,
-        ),
-        Text('${totalPages - currentPage} / $totalPages'),
-        IconButton(
-          icon: Icon(Icons.arrow_forward),
           onPressed: currentPage > 0
               ? () {
             setState(() {
               currentPage--;
+            });
+          }
+              : null,
+        ),
+        Text('${currentPage + 1} / $totalPages'),
+        IconButton(
+          icon: Icon(Icons.arrow_forward),
+          onPressed: currentPage < totalPages - 1
+              ? () {
+            setState(() {
+              currentPage++;
             });
           }
               : null,

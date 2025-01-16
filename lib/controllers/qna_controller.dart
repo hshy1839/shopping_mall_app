@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class QnaController {
-  final String apiUrl = 'http://172.30.49.11:8863/api/qnaQuestion'; // API 엔드포인트
+  final String apiUrl = 'http://172.30.1.49:8865/api/qnaQuestion'; // API 엔드포인트
 
   // QnA 생성
   Future<bool> createQna(String title, String body) async {

@@ -117,6 +117,7 @@ class _MainScreenState extends State<MainScreen> {
           if (_isHeaderVisible) SliverToBoxAdapter(child: Header()),
 
           // 광고 슬라이더
+          // 광고 슬라이더
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.only(top: 20.0, bottom: 20.0),
@@ -127,9 +128,17 @@ class _MainScreenState extends State<MainScreen> {
                     builder: (BuildContext context) {
                       return Container(
                         width: MediaQuery.of(context).size.width,
-                        margin: EdgeInsets.symmetric(horizontal: 5.0),
+                        margin: EdgeInsets.symmetric(horizontal: 5.0, vertical: 10),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8.0),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.5), // 그림자 색상
+                              spreadRadius: 2, // 그림자 확산 반경
+                              blurRadius: 5, // 그림자 흐림 정도
+                              offset: Offset(0, 3), // 그림자의 위치 (x, y)
+                            ),
+                          ],
                           image: DecorationImage(
                             image: NetworkImage(adUrl),
                             fit: BoxFit.cover,
@@ -151,7 +160,6 @@ class _MainScreenState extends State<MainScreen> {
                   : Center(child: CircularProgressIndicator()),
             ),
           ),
-
 
           // 공지사항
           SliverToBoxAdapter(
