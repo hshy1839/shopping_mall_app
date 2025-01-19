@@ -140,6 +140,10 @@ class _OrderScreenState extends State<OrderScreen> {
           SnackBar(content: Text('주문이 성공적으로 완료되었습니다.')),
         );
         Navigator.pop(context); // 주문 성공 시 이전 화면으로 돌아가기
+      } else if (response.statusCode == 400) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('품절된 상품 입니다.')),
+        );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('주문 실패: ${response.body}')),
