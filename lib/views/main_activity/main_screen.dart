@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:intl/intl.dart';
 import '../../controllers/main_screen_controller.dart';
 import '../../controllers/notice_screen_controller.dart';
 import '../../footer.dart';
@@ -50,6 +51,13 @@ class _MainScreenState extends State<MainScreen> {
     _scrollController.dispose();
     super.dispose();
   }
+
+  String formatPrice(String? price) {
+    if (price == null || price.isEmpty) return '0';
+    final formatter = NumberFormat('#,###');
+    return formatter.format(int.parse(price));
+  }
+
 
   // 광고 이미지 불러오기
   Future<void> _loadAds() async {
@@ -316,13 +324,12 @@ class _MainScreenState extends State<MainScreen> {
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 4.0),
+                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
                             child: Text(
-                              '₩ ${product['price'] ?? '상품 가격'}',
+                              '₩ ${formatPrice(product['price'])}',
                               style: TextStyle(
+                                color: Colors.red,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                                fontSize: 18,
                               ),
                             ),
                           ),

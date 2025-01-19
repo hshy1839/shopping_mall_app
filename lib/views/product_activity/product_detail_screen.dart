@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../controllers/profile_screen_controller.dart';
 import '../../controllers/product_controller.dart';
@@ -10,6 +11,11 @@ class ProductDetailScreen extends StatelessWidget {
   final String productId;
 
   ProductDetailScreen({required this.product, required this.productId});
+
+  String formatPrice(int price) {
+    final formatter = NumberFormat('#,###');
+    return formatter.format(price);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +71,7 @@ class ProductDetailScreen extends StatelessWidget {
                       ),
                       SizedBox(height: 8),
                       Text(
-                        '₩ ${product['price'] ?? '상품 가격'}',
+                        '₩ ${formatPrice(int.parse(product['price'] ?? '0'))}',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -182,18 +188,22 @@ class ProductDetailScreen extends StatelessWidget {
 class ProductOptionsBottomSheet extends StatefulWidget {
   final Map<String, dynamic> product;
   final String productId;
-
   ProductOptionsBottomSheet({required this.product, required this.productId});
 
   @override
   _ProductOptionsBottomSheetState createState() =>
       _ProductOptionsBottomSheetState();
 }
+String formatPrice(int price) {
+  final formatter = NumberFormat('#,###');
+  return formatter.format(price);
+}
 
 class _ProductOptionsBottomSheetState extends State<ProductOptionsBottomSheet> {
   Map<String, int> sizeQuantity = {};
   Map<String, int> sizeStock = {}; // 서버에서 가져온 사이즈 재고
   String userId = '';
+
 
   @override
   void initState() {
@@ -232,6 +242,9 @@ class _ProductOptionsBottomSheetState extends State<ProductOptionsBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    // 재고가 있는 사이즈만 필터링
+    final availableSizes = sizeStock.entries.where((entry) => entry.value > 0).toList();
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: Padding(
@@ -244,31 +257,40 @@ class _ProductOptionsBottomSheetState extends State<ProductOptionsBottomSheet> {
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
             ),
             SizedBox(height: 16),
-            Wrap(
-              spacing: 8.0,
-              runSpacing: 8.0,
-              children: sizeStock.entries.map((entry) {
-                final size = entry.key;
-                final stock = entry.value;
+            if (availableSizes.isEmpty)
+              Center(
+                child: Text(
+                  '품절된 상품입니다.',
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              )
+            else
+              Wrap(
+                spacing: 8.0,
+                runSpacing: 8.0,
+                children: availableSizes.map((entry) {
+                  final size = entry.key;
 
-                return _SizeOptionButton(
-                  size: size,
-                  isSelected: sizeQuantity.containsKey(size),
-                  isDisabled: stock <= 0,
-                  onTap: () {
-                    if (stock > 0) {
+                  return _SizeOptionButton(
+                    size: size,
+                    isSelected: sizeQuantity.containsKey(size),
+                    isDisabled: false, // 재고가 있는 경우만 표시
+                    onTap: () {
                       setState(() {
                         if (sizeQuantity.containsKey(size)) {
                           sizeQuantity.remove(size);
                         } else {
-                          sizeQuantity[size] = 1;
+                          sizeQuantity[size] = 1; // 기본 수량 1로 설정
                         }
                       });
-                    }
-                  },
-                );
-              }).toList(),
-            ),
+                    },
+                  );
+                }).toList(),
+              ),
             if (sizeQuantity.isNotEmpty)
               Expanded(
                 child: ListView(
@@ -305,7 +327,48 @@ class _ProductOptionsBottomSheetState extends State<ProductOptionsBottomSheet> {
                                 ),
                               ],
                             ),
-                            Text('가격: ₩ ${int.parse(widget.product['price'].toString()) * sizeQuantity[size]!}'),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  '가격: ₩ ${formatPrice(int.parse(widget.product['price'].toString()) * sizeQuantity[size]!)}',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Row(
+                                  children: [
+                                    IconButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          if (sizeQuantity[size]! > 1) {
+                                            sizeQuantity[size] = sizeQuantity[size]! - 1;
+                                          }
+                                        });
+                                      },
+                                      icon: Icon(Icons.remove_circle_outline),
+                                    ),
+                                    Text(
+                                      '${sizeQuantity[size]}',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    IconButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          if (sizeQuantity[size]! < sizeStock[size]!) {
+                                            sizeQuantity[size] = sizeQuantity[size]! + 1;
+                                          }
+                                        });
+                                      },
+                                      icon: Icon(Icons.add_circle_outline),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ],
                         ),
                       ),
@@ -317,11 +380,12 @@ class _ProductOptionsBottomSheetState extends State<ProductOptionsBottomSheet> {
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: Text(
-                  '총 금액 ₩ $totalAmount',
+                  '총 금액 ₩ ${formatPrice(totalAmount)}',
                   style: TextStyle(
-                      color: Colors.red,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15),
+                    color: Colors.red,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
                 ),
               ),
             Padding(
@@ -338,8 +402,7 @@ class _ProductOptionsBottomSheetState extends State<ProductOptionsBottomSheet> {
                           return;
                         }
 
-                        List<Map<String, dynamic>> selectedSizes =
-                        sizeQuantity.entries
+                        List<Map<String, dynamic>> selectedSizes = sizeQuantity.entries
                             .map((entry) => {
                           'size': entry.key,
                           'quantity': entry.value,
@@ -378,6 +441,7 @@ class _ProductOptionsBottomSheetState extends State<ProductOptionsBottomSheet> {
       ),
     );
   }
+
 }
 
 class _SizeOptionButton extends StatelessWidget {
