@@ -69,8 +69,18 @@ class MyApp extends StatelessWidget {
 
       case '/shoppingscreen':
         return MaterialPageRoute(
-          builder: (_) => ShoppingScreen(categoryName: 'Selected Category'),
+          builder: (context) {
+            // 전달된 arguments에서 카테고리 이름 가져오기
+            final category = settings.arguments as String? ?? '카테고리 없음';
+
+            // 카테고리 이름 출력
+
+            return ShoppingScreen(category: category); // 전달받은 카테고리를 ShoppingScreen으로 전달
+          },
         );
+
+
+
       case '/cart':
         return MaterialPageRoute(builder: (_) => CartDetailScreen());
       case '/orderdetail':

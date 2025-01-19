@@ -74,7 +74,49 @@ class ProductDetailScreen extends StatelessWidget {
                     ],
                   ),
                 ),
+
                 Divider(),
+                // 추가 이미지
+                if (product['additionalImageUrls'] != null &&
+                    product['additionalImageUrls'].isNotEmpty)
+                  Padding(
+                    padding:
+                    const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '추가 이미지',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 18),
+                        ),
+                        SizedBox(height: 15),
+                        Column(
+                          children: List.generate(
+                            product['additionalImageUrls']
+                                .split(',')
+                                .length, // ','로 구분된 URL의 개수만큼 반복
+                                (index) {
+                              final imageUrl =
+                              product['additionalImageUrls'].split(',')[index];
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 8.0),
+                                child: Image.network(
+                                  imageUrl,
+                                  fit: BoxFit.fill,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Image.asset('assets/images/placeholder.png'); // 대체 이미지
+                                  },
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                Divider(),
+
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(

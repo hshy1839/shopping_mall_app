@@ -21,16 +21,15 @@ class _MainScreenState extends State<MainScreen> {
   List<String> ads = []; // 서버에서 가져온 광고 이미지 URL 리스트
 
   final List<Map<String, String>> categories = [
-    {'name': '남성의류', 'icon': 'assets/icons/cloth_man.png'},
+    {'name': '골프의류', 'icon': 'assets/icons/golf_cloth.png'},
+    {'name': '일반의류', 'icon': 'assets/icons/cloth_man.png'},
+    {'name': '남성의류', 'icon': 'assets/icons/outer.png'},
     {'name': '여성의류', 'icon': 'assets/icons/cloth_woman.png'},
-    {'name': '골프의류', 'icon': 'assets/icons/outer.png'},
-    {'name': '일반의류', 'icon': 'assets/icons/top.png'},
-    {'name': '기타', 'icon': 'assets/icons/pants.png'},
-    {'name': '지갑', 'icon': 'assets/icons/cap.png'},
+    {'name': '지갑', 'icon': 'assets/icons/wallet.png'},
     {'name': '가방', 'icon': 'assets/icons/bag.png'},
     {'name': '신발', 'icon': 'assets/icons/shoes.png'},
-    {'name': '골프가방', 'icon': 'assets/icons/bag.png'},
-    {'name': '골프신발', 'icon': 'assets/icons/shoes.png'},
+    {'name': '기타', 'icon': 'assets/icons/cap.png'},
+
   ];
 
   ScrollController _scrollController = ScrollController();
@@ -225,7 +224,7 @@ class _MainScreenState extends State<MainScreen> {
           // 카테고리
           SliverToBoxAdapter(
             child: Container(
-              padding: EdgeInsets.only(top: 30.0, left: 8.0, right: 8.0),
+              padding: EdgeInsets.only(top: 50.0, left: 8.0, right: 8.0, bottom: 50.0),
               child: Wrap(
                 alignment: WrapAlignment.center,
                 spacing: 10.0,
@@ -233,11 +232,13 @@ class _MainScreenState extends State<MainScreen> {
                 children: categories.map((category) {
                   return GestureDetector(
                     onTap: () {
+
                       Navigator.pushNamed(
                         context,
-                        '/shoppingscreen',
-                        arguments: category['name'],
+                        '/shoppingscreen', // ShoppingScreen의 라우트 이름
+                        arguments: category['name'], // 선택한 카테고리 이름 전달
                       );
+
                     },
                     child: Container(
                       width: (MediaQuery.of(context).size.width - 40) / 5,
@@ -265,7 +266,7 @@ class _MainScreenState extends State<MainScreen> {
 
           // 추천 상품
           SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 30.0),
             sliver: SliverGrid(
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,

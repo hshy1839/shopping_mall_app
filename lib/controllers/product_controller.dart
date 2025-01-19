@@ -84,6 +84,70 @@ class ProductController {
     }
   }
 
+  Future<List<Map<String, String>>> fetchProductsByCategory({
+    required String category,
+  }) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token') ?? '';
+
+      if (token.isEmpty) {
+        throw Exception('토큰이 없습니다. 로그인 상태를 확인하세요.');
+      }
+
+      // 쿼리 파라미터 설정
+      final url = Uri.parse(
+          'http://172.30.50.18:8865/api/products/allProduct/category?category=$category');
+
+      final response = await http.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token', // Bearer 토큰 추가
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final decodedResponse = json.decode(response.body);
+
+        if (decodedResponse is Map<String, dynamic> && decodedResponse['products'] is List<dynamic>) {
+          final List<dynamic> data = decodedResponse['products'];
+          const serverUrl = 'http://172.30.50.18:8865';
+
+          return data.map((item) {
+            final category = item['category'] != null && item['category'] is Map<String, dynamic>
+                ? '${item['category']['main'] ?? ''} > ${item['category']['sub'] ?? ''}'
+                : '';
+
+            final additionalImageUrls = item['additionalImages'] != null && item['additionalImages'] is List<dynamic>
+                ? (item['additionalImages'] as List<dynamic>).map((image) => '$serverUrl$image').toList() // 서버 URL 추가
+                : [];  // 빈 배열 반환
+
+            return {
+              'id': item['_id']?.toString() ?? '',
+              'name': item['name']?.toString() ?? '',
+              'price': item['price']?.toString() ?? '',
+              'category': category,
+              'mainImageUrl': serverUrl + (item['mainImage']?[0] ?? ''),
+              'additionalImageUrls': additionalImageUrls.join(','), // 추가 이미지들을 ','로 구분하여 저장
+              'description': item['description']?.toString() ?? '',
+            };
+          }).toList();
+        } else {
+          throw Exception('응답 데이터 형식이 올바르지 않습니다.');
+        }
+      } else {
+        print('API 호출 실패: ${response.statusCode}, ${response.body}');
+        return [];
+      }
+    } catch (error) {
+      print('상품 조회 중 오류 발생: $error');
+      return [];
+    }
+  }
+
+
+
+
   // 날짜 포맷 함수
   String _formatDate(String originalDate) {
     try {
