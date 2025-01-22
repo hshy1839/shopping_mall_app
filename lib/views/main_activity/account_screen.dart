@@ -20,7 +20,7 @@ class _AccountScreenState extends State<AccountScreen> {
   Future<void> _fetchAccounts() async {
     try {
       final response = await http.get(
-        Uri.parse('http://192.168.25.15:8865/api/accountInfo'),
+        Uri.parse('http://3.104.4.81:8865/api/accountInfo'),
         headers: {'Content-Type': 'application/json'},
       );
 
