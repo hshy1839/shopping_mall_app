@@ -304,7 +304,7 @@ class _OrderScreenState extends State<OrderScreen> {
   void _showAddressInputSheet(BuildContext context) async {
     String name = '';
     String phone = '';
-    String address = '';
+    String addressInput = ''; // 기존 address와 변수명 충돌 방지
     String address2 = '';
     String postalCode = '';
 
@@ -315,13 +315,12 @@ class _OrderScreenState extends State<OrderScreen> {
         final shippingAddress = shippingInfo['shipping']['shippingAddress'];
         name = shippingAddress['name'] ?? '';
         phone = shippingAddress['phone'] ?? '';
-        address = shippingAddress['address'] ?? '';
+        addressInput = shippingAddress['address'] ?? '';
         address2 = shippingAddress['address2'] ?? '';
         postalCode = shippingAddress['postalCode'] ?? '';
       }
     } catch (e) {
       print('배송 정보 로드 실패: $e');
-      // 이전 배송 정보가 없을 경우 기본값으로 유지
     }
 
     showModalBottomSheet(
@@ -359,10 +358,10 @@ class _OrderScreenState extends State<OrderScreen> {
               ),
               SizedBox(height: 10),
               TextField(
-                controller: TextEditingController(text: address),
+                controller: TextEditingController(text: addressInput),
                 decoration: InputDecoration(labelText: '주소'),
                 onChanged: (value) {
-                  address = value;
+                  addressInput = value;
                 },
               ),
               SizedBox(height: 10),
@@ -389,12 +388,17 @@ class _OrderScreenState extends State<OrderScreen> {
                     final response = await OrderScreenController.addToShipping(
                       name: name,
                       phone: phone,
-                      address: address,
+                      address: addressInput,
                       address2: address2,
                       postalCode: postalCode,
                     );
 
                     if (response.statusCode == 201 || response.statusCode == 200) {
+                      // 성공적으로 저장된 경우, 상태 업데이트
+                      setState(() {
+                        address = addressInput; // 즉시 `address` 상태 업데이트
+                      });
+
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('배송지가 성공적으로 저장되었습니다.')),
                       );
