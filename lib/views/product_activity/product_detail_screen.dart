@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../controllers/cart_controller.dart';
 import '../../controllers/profile_screen_controller.dart';
 import '../../controllers/product_controller.dart';
 import '../main_activity/order_screen.dart';
@@ -201,16 +202,15 @@ String formatPrice(int price) {
 
 class _ProductOptionsBottomSheetState extends State<ProductOptionsBottomSheet> {
   Map<String, int> sizeQuantity = {};
-  Map<String, int> sizeStock = {}; // 서버에서 가져온 사이즈 재고
+  Map<String, int> sizeStock = {};
   String userId = '';
-
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await fetchProductInfo(); // 상품 정보 가져오기
-      await fetchUserId(); // 사용자 ID 가져오기
+      await fetchProductInfo();
+      await fetchUserId();
     });
   }
 
@@ -242,8 +242,8 @@ class _ProductOptionsBottomSheetState extends State<ProductOptionsBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    // 재고가 있는 사이즈만 필터링
-    final availableSizes = sizeStock.entries.where((entry) => entry.value > 0).toList();
+    final availableSizes =
+    sizeStock.entries.where((entry) => entry.value > 0).toList();
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -275,19 +275,22 @@ class _ProductOptionsBottomSheetState extends State<ProductOptionsBottomSheet> {
                 children: availableSizes.map((entry) {
                   final size = entry.key;
 
-                  return _SizeOptionButton(
-                    size: size,
-                    isSelected: sizeQuantity.containsKey(size),
-                    isDisabled: false, // 재고가 있는 경우만 표시
+                  return GestureDetector(
                     onTap: () {
                       setState(() {
                         if (sizeQuantity.containsKey(size)) {
                           sizeQuantity.remove(size);
                         } else {
-                          sizeQuantity[size] = 1; // 기본 수량 1로 설정
+                          sizeQuantity[size] = 1;
                         }
                       });
                     },
+                    child: Chip(
+                      label: Text(size),
+                      backgroundColor: sizeQuantity.containsKey(size)
+                          ? Colors.blue
+                          : Colors.grey.shade300,
+                    ),
                   );
                 }).toList(),
               ),
@@ -342,7 +345,8 @@ class _ProductOptionsBottomSheetState extends State<ProductOptionsBottomSheet> {
                                       onPressed: () {
                                         setState(() {
                                           if (sizeQuantity[size]! > 1) {
-                                            sizeQuantity[size] = sizeQuantity[size]! - 1;
+                                            sizeQuantity[size] =
+                                                sizeQuantity[size]! - 1;
                                           }
                                         });
                                       },
@@ -358,8 +362,10 @@ class _ProductOptionsBottomSheetState extends State<ProductOptionsBottomSheet> {
                                     IconButton(
                                       onPressed: () {
                                         setState(() {
-                                          if (sizeQuantity[size]! < sizeStock[size]!) {
-                                            sizeQuantity[size] = sizeQuantity[size]! + 1;
+                                          if (sizeQuantity[size]! <
+                                              sizeStock[size]!) {
+                                            sizeQuantity[size] =
+                                                sizeQuantity[size]! + 1;
                                           }
                                         });
                                       },
@@ -394,6 +400,63 @@ class _ProductOptionsBottomSheetState extends State<ProductOptionsBottomSheet> {
                 children: [
                   Expanded(
                     child: ElevatedButton(
+                      onPressed: () async {
+                        if (sizeQuantity.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('사이즈와 수량을 선택해주세요.')),
+                          );
+                          return;
+                        }
+
+                        List<Map<String, dynamic>> cartItems =
+                        sizeQuantity.entries.map((entry) {
+                          return {
+                            'size': entry.key,
+                            'quantity': entry.value,
+                          };
+                        }).toList();
+
+                        try {
+                          // Cart API Call
+                          final response = await CartController.addToCart(
+                            userId: userId,
+                            productId: widget.productId,
+                            productName: widget.product['name'],
+                            sizes: cartItems,
+                            price: int.parse(widget.product['price']),
+                          );
+
+                          if (response.statusCode == 200) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('장바구니에 추가되었습니다.')),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('장바구니 추가에 실패했습니다.')),
+                            );
+                          }
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('서버 오류 발생. 다시 시도해주세요.')),
+                          );
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      child: Text(
+                        '장바구니',
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: ElevatedButton(
                       onPressed: () {
                         if (sizeQuantity.isEmpty) {
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -402,12 +465,13 @@ class _ProductOptionsBottomSheetState extends State<ProductOptionsBottomSheet> {
                           return;
                         }
 
-                        List<Map<String, dynamic>> selectedSizes = sizeQuantity.entries
-                            .map((entry) => {
-                          'size': entry.key,
-                          'quantity': entry.value,
-                        })
-                            .toList();
+                        List<Map<String, dynamic>> selectedSizes =
+                        sizeQuantity.entries.map((entry) {
+                          return {
+                            'size': entry.key,
+                            'quantity': entry.value,
+                          };
+                        }).toList();
 
                         Navigator.push(
                           context,
@@ -441,8 +505,8 @@ class _ProductOptionsBottomSheetState extends State<ProductOptionsBottomSheet> {
       ),
     );
   }
-
 }
+
 
 class _SizeOptionButton extends StatelessWidget {
   final String size;
