@@ -41,15 +41,17 @@ class ProductDetailScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(
-                  height: 300,
+                  width: double.infinity, // 가로 너비를 무조건 최대로 설정
+                  height: 300, // 원하는 높이 설정
                   child: Image.network(
                     product['mainImageUrl'] ?? '',
-                    fit: BoxFit.cover,
+                    fit: BoxFit.cover, // ✅ 컨테이너에 꽉 채우기 (일부 잘릴 수도 있음)
                     errorBuilder: (context, error, stackTrace) {
-                      return Image.asset('assets/images/placeholder.png');
+                      return Image.asset('assets/images/placeholder.png', fit: BoxFit.cover);
                     },
                   ),
                 ),
+
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
