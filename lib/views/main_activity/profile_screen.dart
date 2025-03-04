@@ -120,47 +120,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ],
               ),
             ),
-            SizedBox(height: 10.0),
             // 장바구니, 주문내역, 문의 (하나의 사각형으로 묶음)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
-              child: Container(
-                padding: const EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey[300]!), // 테두리 색상
-                  borderRadius: BorderRadius.circular(12.0), // 둥근 모서리
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    _buildStatItem(
-                      context,
-                      title: '장바구니',
-                      count: cartCount, // 장바구니 항목 개수
-                      onTap: () {
-                        Navigator.pushNamed(context, '/cart'); // 장바구니 화면으로 이동
-                      },
-                    ),
-                    _buildStatItem(
-                      context,
-                      title: '주문내역',
-                      count: orderCount,
-                      onTap: () {
-                        Navigator.pushNamed(context, '/orders'); // 주문 내역 화면으로 이동
-                      },
-                    ),
-                    _buildStatItem(
-                      context,
-                      title: '문의',
-                      count: inquiryCount,
-                      onTap: () {
-                        Navigator.pushNamed(context, '/qna'); // QnA 화면으로 이동
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ),
+
             SizedBox(height: 20.0),
             Divider(color: Colors.grey[300], thickness: 1.0),
 
@@ -171,15 +132,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               trailing: Icon(Icons.arrow_forward_ios, size: 16.0, color: Colors.grey),
               onTap: () {
                 Navigator.pushNamed(context, '/notice');
-              },
-            ),
-            Divider(color: Colors.grey[300], thickness: 1.0),
-            ListTile(
-              title: Text('1:1 문의', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
-              leading: Icon(Icons.back_hand_outlined, color: Colors.grey), // 문의 아이콘
-              trailing: Icon(Icons.arrow_forward_ios, size: 16.0, color: Colors.grey),
-              onTap: () {
-                Navigator.pushNamed(context, '/qna');
               },
             ),
             Divider(color: Colors.grey[300], thickness: 1.0),
