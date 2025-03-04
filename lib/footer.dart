@@ -24,24 +24,17 @@ class Footer extends StatelessWidget {
 
           _buildFooterItem(
             context,
-            icon: Icons.back_hand_outlined,
-            label: '1:1 문의',
+            icon: Icons.notifications_outlined,
+            label: '공지사항',
             index: 1,
           ),
 
-          // 구매내역 탭
-          _buildFooterItem(
-            context,
-            icon: Icons.receipt_long_outlined,
-            label: '주문내역',
-            index: 2,
-          ),
           // 마이페이지 탭
           _buildFooterItem(
             context,
             icon: Icons.person_outline,
             label: '마이페이지',
-            index: 3,
+            index: 2,
           ),
         ],
       ),

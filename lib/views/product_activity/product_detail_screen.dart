@@ -178,7 +178,7 @@ class ProductDetailScreen extends StatelessWidget {
               ),
             ),
             child: Text(
-              '구매하기',
+              '구매문의',
               style: TextStyle(fontSize: 16, color: Colors.white),
             ),
           ),
@@ -259,18 +259,6 @@ class _ProductOptionsBottomSheetState extends State<ProductOptionsBottomSheet> {
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
             ),
             SizedBox(height: 16),
-            if (availableSizes.isEmpty)
-              Center(
-                child: Text(
-                  '품절된 상품입니다.',
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              )
-            else
               Wrap(
                 spacing: 8.0,
                 runSpacing: 8.0,
