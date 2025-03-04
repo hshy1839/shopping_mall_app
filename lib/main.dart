@@ -1,5 +1,4 @@
 import 'package:attedance_app/views/main_activity/account_screen.dart';
-import 'package:attedance_app/views/main_activity/cart_detail_screen.dart';
 import 'package:attedance_app/views/main_activity/order_screen.dart';
 import 'package:attedance_app/views/main_activity/qna_create_screen.dart';
 import 'package:attedance_app/views/main_activity/qna_screen.dart';
@@ -77,15 +76,6 @@ class MyApp extends StatelessWidget {
 
             return ShoppingScreen(category: category); // 전달받은 카테고리를 ShoppingScreen으로 전달
           },
-        );
-
-
-
-      case '/cart':
-        return MaterialPageRoute(builder: (_) => CartDetailScreen());
-      case '/orderdetail':
-        return MaterialPageRoute(
-          builder: (context) => OrderDetailScreen(),
         );
 
       case '/order':

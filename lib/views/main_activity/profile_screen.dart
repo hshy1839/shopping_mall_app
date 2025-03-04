@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../controllers/profile_screen_controller.dart';
-import '../../controllers/cart_controller.dart';
 import '../../controllers/qna_controller.dart'; // QnaController 추가
 
 class ProfileScreen extends StatefulWidget {
@@ -12,7 +11,6 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   final ProfileScreenController _controller = ProfileScreenController(); // 프로필 컨트롤러 인스턴스
   final QnaController _qnaController = QnaController(); // Qna 컨트롤러 인스턴스
-  final CartController _cartController = CartController(); // 장바구니 컨트롤러 인스턴스
 
   String username = "회원님"; // 초기 사용자 이름
   String name = "회원"; // 초기 이름
@@ -25,7 +23,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.initState();
     fetchUserDetails(); // 사용자 정보 가져오기
     fetchUserOrders(); // 주문 내역 가져오기
-    fetchCartItems(); // 장바구니 항목 개수 가져오기
     fetchInquiryCount(); // 문의 개수 가져오기
   }
 
@@ -56,41 +53,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  Future<void> fetchCartItems() async {
-    try {
-      final String token = await _getToken();
 
-      // userId를 SharedPreferences에서 가져오기
-      final prefs = await SharedPreferences.getInstance();
-      String? userId = prefs.getString('userId');
-
-      // userId가 없는 경우 서버에서 가져오기
-      if (userId == null || userId.isEmpty) {
-        final profileController = ProfileScreenController();
-        await profileController.fetchUserId(context);
-        userId = profileController.userId;
-
-        if (userId.isEmpty) {
-          throw Exception('userId를 가져올 수 없습니다.');
-        }
-
-        // SharedPreferences에 userId 저장
-        await prefs.setString('userId', userId);
-      }
-
-      if (token.isEmpty) {
-        throw Exception('로그인 토큰이 없습니다.');
-      }
-
-      final cartItems = await _cartController.fetchCartData(userId, token);
-
-      setState(() {
-        cartCount = cartItems.length; // 장바구니 항목 개수 업데이트
-      });
-    } catch (e) {
-      print('장바구니 항목 개수를 가져오는 중 오류 발생: $e');
-    }
-  }
 
   Future<String> _getToken() async {
     final prefs = await SharedPreferences.getInstance();

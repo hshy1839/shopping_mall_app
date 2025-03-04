@@ -31,13 +31,6 @@ class Header extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    IconButton(
-                      icon: Icon(Icons.shopping_cart, color: Colors.black),
-                      onPressed: () {
-                        // 장바구니 화면으로 이동
-                        Navigator.pushNamed(context, '/cart');
-                      },
-                    ),
                   ],
                 ),
                 SizedBox(height: 8.0), // 줄 간격
