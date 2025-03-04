@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../product_activity/product_detail_screen.dart';
+
 class CategoryScreen extends StatelessWidget {
   // 각 카테고리의 항목들
   final List<Map<String, String>> categories = [
@@ -78,49 +80,97 @@ class CategoryItemsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Text(
-            categoryName,
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-        ),
-        Expanded(
-          child: GridView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-            ),
-            itemCount: items.length,
-            itemBuilder: (context, index) {
-              return GestureDetector(
-                onTap: () {
-                  // 아이템 클릭 시 아이템 상세보기 화면으로 이동
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(categoryName),
+      ),
+      body: CustomScrollView(
+        slivers: <Widget>[
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 30.0),
+            sliver: SliverGrid(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                childAspectRatio: 1.5,
+              ),
+              delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                  final item = items[index];
+                  return GestureDetector(
+                    onTap: () {
+                      // Navigate to the product detail screen
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ProductDetailScreen(
+                            product: item,
+                            productId: item['id'] ?? '',
+                          ),
+                        ),
+                      );
+                    },
+                    child: Card(
+                      color: Colors.white,
+                      elevation: 0,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8.0),
+                              child: Image.asset(
+                                item['image']!,
+                                fit: BoxFit.cover,
+                                height: 200,
+                                width: double.infinity,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Text(
+                              '₩ ${item['price']}', // Assuming 'price' key holds the price
+                              style: TextStyle(
+                                color: Colors.red,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 4.0),
+                            child: Text(
+                              item['category'] ?? '카테고리',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Text(
+                              item['name']!,
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
                 },
-                child: Column(
-                  children: [
-                    Image.asset(
-                      items[index]['image']!,
-                      height: 120,
-                      width: 120,
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      items[index]['name']!,
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ],
-                ),
-              );
-            },
+                childCount: items.length,
+              ),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

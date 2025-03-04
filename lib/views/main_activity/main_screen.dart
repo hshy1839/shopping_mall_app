@@ -124,7 +124,6 @@ class _MainScreenState extends State<MainScreen> {
           if (_isHeaderVisible) SliverToBoxAdapter(child: Header()),
 
           // 광고 슬라이더
-          // 광고 슬라이더
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.only(top: 20.0, bottom: 20.0),
@@ -160,7 +159,7 @@ class _MainScreenState extends State<MainScreen> {
                   autoPlay: true,
                   autoPlayInterval: Duration(seconds: 3),
                   enlargeCenterPage: true,
-                  aspectRatio: 2.0,
+                  aspectRatio: 2,
                   onPageChanged: (index, reason) {},
                 ),
               )
@@ -280,7 +279,7 @@ class _MainScreenState extends State<MainScreen> {
                 crossAxisCount: 2,
                 crossAxisSpacing: 0,
                 mainAxisSpacing: 0,
-                childAspectRatio: 0.75,
+                childAspectRatio: 1,
               ),
               delegate: SliverChildBuilderDelegate(
                     (context, index) {
@@ -309,7 +308,7 @@ class _MainScreenState extends State<MainScreen> {
                               child: Image.network(
                                 product['mainImageUrl'] ?? 'assets/images/nike1.png',
                                 fit: BoxFit.cover,
-                                height: 200,
+                                height: 250,
                                 width: double.infinity,
                                 loadingBuilder: (context, child, loadingProgress) {
                                   if (loadingProgress == null) {

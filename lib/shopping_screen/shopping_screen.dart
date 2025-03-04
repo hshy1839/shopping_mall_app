@@ -77,7 +77,7 @@ class _ShoppingScreenState extends State<ShoppingScreen> {
             crossAxisCount: 2,
             crossAxisSpacing: 16,
             mainAxisSpacing: 16,
-            childAspectRatio: 0.75,
+            childAspectRatio: 1,
           ),
           itemCount: filteredProducts.length,
           itemBuilder: (context, index) {
@@ -110,6 +110,7 @@ class _ShoppingScreenState extends State<ShoppingScreen> {
                           product['mainImageUrl'] ?? '',
                           fit: BoxFit.cover,
                           width: double.infinity,
+                          height: 200,
                           errorBuilder: (context, error, stackTrace) {
                             return Center(child: Icon(Icons.error));
                           },
@@ -120,18 +121,8 @@ class _ShoppingScreenState extends State<ShoppingScreen> {
                         ),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        product['name'] ?? '상품 제목',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
+                    SizedBox(height: 10,),
+
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: Text(
@@ -142,6 +133,32 @@ class _ShoppingScreenState extends State<ShoppingScreen> {
                         ),
                       ),
                     ),
+
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Text(
+                        product['category'] ?? '카테고리',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Text(
+                        product['name'] ?? '상품 제목',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey,
+                          fontSize: 14,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    SizedBox(height: 10,),
                   ],
                 ),
               ),

@@ -19,7 +19,7 @@ class ProfileScreenController extends ChangeNotifier {
       }
 
       final response = await http.get(
-        Uri.parse('http://3.39.192.73:8865/api/users/userinfoget'),
+        Uri.parse('http://3.36.74.8:8865/api/users/userinfoget'),
         headers: {
           'Authorization': 'Bearer $token',
         },
@@ -55,7 +55,7 @@ class ProfileScreenController extends ChangeNotifier {
       }
 
       final response = await http.get(
-        Uri.parse('http://3.39.192.73:8865/api/users/userinfoget'),
+        Uri.parse('http://3.36.74.8:8865/api/users/userinfoget'),
         headers: {
           'Authorization': 'Bearer $token',
         },
@@ -93,7 +93,7 @@ class ProfileScreenController extends ChangeNotifier {
       }
 
       final response = await http.get(
-        Uri.parse('http://3.39.192.73:8865/api/orderByUser'),
+        Uri.parse('http://3.36.74.8:8865/api/orderByUser'),
         headers: {
           'Authorization': 'Bearer $token',
         },

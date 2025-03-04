@@ -19,7 +19,7 @@ class NoticeScreenController {
       }
 
       final response = await http.get(
-        Uri.parse('http://3.39.192.73:8865/api/users/noticeList/find'),
+        Uri.parse('http://3.36.74.8:8865/api/users/noticeList/find'),
         headers: {
           'Authorization': 'Bearer $token', // Bearer 토큰 추가
         },
