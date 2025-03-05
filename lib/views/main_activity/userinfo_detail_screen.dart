@@ -10,7 +10,8 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController phoneNumberController = TextEditingController();
-
+  final TextEditingController addressController = TextEditingController();
+  final TextEditingController detailAddressController = TextEditingController();
   final UserInfoScreenController _userInfoController = UserInfoScreenController();
 
   @override
@@ -22,22 +23,28 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
   // 사용자 데이터 로드
   Future<void> _loadUserData() async {
     await _userInfoController.fetchUserInfo(context);
+    await _userInfoController.fetchShippingInfo(context); // 배송지 정보 가져오기
     setState(() {
       nameController.text = _userInfoController.name;
       usernameController.text = _userInfoController.username;
       phoneNumberController.text = _userInfoController.phoneNumber;
+      addressController.text = _userInfoController.address; // 주소 필드 설정
+      detailAddressController.text = _userInfoController.detailAddress; // 상세 주소 필드 설정
     });
   }
+
 
   // 사용자 데이터 저장
   Future<void> _saveUserData() async {
     try {
       final updatedName = nameController.text;
       final updatedPhoneNumber = phoneNumberController.text;
+      final updatedAddress = addressController.text;
+      final updatedDetailAddress = detailAddressController.text;
 
       // 서버에 사용자 정보 업데이트 요청
       await _userInfoController.updateUserInfo(context, updatedName, updatedPhoneNumber);
-
+      await _userInfoController.updateShippingInfo(context, updatedAddress, updatedDetailAddress);
       // 저장 완료 메시지
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("사용자 정보가 성공적으로 저장되었습니다.")),
@@ -115,7 +122,34 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                 ),
                 keyboardType: TextInputType.phone,
               ),
+              SizedBox(height: 16.0),
 
+              TextField(
+                controller: addressController, // 올바른 컨트롤러 할당
+                decoration: InputDecoration(
+                  labelText: "주소",
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey),
+                  ),
+                ),
+              ),
+              SizedBox(height: 16.0),
+
+              TextField(
+                controller: detailAddressController, // 올바른 컨트롤러 할당
+                decoration: InputDecoration(
+                  labelText: "상세주소",
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey),
+                  ),
+                ),
+              ),
               SizedBox(height: 60.0),
               Center(
                 child: ElevatedButton(

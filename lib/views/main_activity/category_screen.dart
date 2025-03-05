@@ -93,7 +93,7 @@ class CategoryItemsScreen extends StatelessWidget {
                 crossAxisCount: 2,
                 crossAxisSpacing: 10,
                 mainAxisSpacing: 10,
-                childAspectRatio: 1.5,
+                childAspectRatio: 0.75,
               ),
               delegate: SliverChildBuilderDelegate(
                     (context, index) {
@@ -119,11 +119,11 @@ class CategoryItemsScreen extends StatelessWidget {
                         children: [
                           Expanded(
                             child: ClipRRect(
-                              borderRadius: BorderRadius.circular(8.0),
+                              borderRadius: BorderRadius.circular(5.0),
                               child: Image.asset(
                                 item['image']!,
                                 fit: BoxFit.cover,
-                                height: 200,
+                                height: 300,
                                 width: double.infinity,
                               ),
                             ),

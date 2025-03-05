@@ -19,6 +19,8 @@ class Header extends StatelessWidget {
             ),
             child: Column(
               children: [
+                SizedBox(height: 20,),
+
                 // 첫 번째 줄: 로고와 장바구니 아이콘
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -27,7 +29,7 @@ class Header extends StatelessWidget {
                       'Alice',
                       style: TextStyle(
                         color: Colors.black,
-                        fontSize: 20.0,
+                        fontSize: 24.0,
                         fontWeight: FontWeight.bold,
                       ),
                     ),

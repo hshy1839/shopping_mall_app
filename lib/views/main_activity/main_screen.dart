@@ -273,13 +273,13 @@ class _MainScreenState extends State<MainScreen> {
 
           // 추천 상품
           SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 30.0),
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
             sliver: SliverGrid(
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 crossAxisSpacing: 0,
                 mainAxisSpacing: 0,
-                childAspectRatio: 1,
+                childAspectRatio: 0.75,
               ),
               delegate: SliverChildBuilderDelegate(
                     (context, index) {
@@ -298,17 +298,17 @@ class _MainScreenState extends State<MainScreen> {
                     },
                     child: Card(
                       color: Colors.white,
-                      elevation: 0,
+                      elevation: 1,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Expanded(
                             child: ClipRRect(
-                              borderRadius: BorderRadius.circular(8.0),
+                              borderRadius: BorderRadius.circular(5.0),
                               child: Image.network(
                                 product['mainImageUrl'] ?? 'assets/images/nike1.png',
                                 fit: BoxFit.cover,
-                                height: 250,
+                                height: 500,
                                 width: double.infinity,
                                 loadingBuilder: (context, child, loadingProgress) {
                                   if (loadingProgress == null) {
@@ -333,7 +333,7 @@ class _MainScreenState extends State<MainScreen> {
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 4.0),
+                            padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
                             child: Text(
                               product['category'] ?? '카테고리',
                               style: TextStyle(
@@ -344,7 +344,7 @@ class _MainScreenState extends State<MainScreen> {
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 0.0),
+                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
                             child: Text(
                               product['name'] ?? '상품 제목',
                               style: TextStyle(
@@ -354,6 +354,7 @@ class _MainScreenState extends State<MainScreen> {
                               ),
                             ),
                           ),
+                          SizedBox(height: 10,)
                         ],
                       ),
                     ),

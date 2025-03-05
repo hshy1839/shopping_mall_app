@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../controllers/profile_screen_controller.dart';
-import '../../controllers/qna_controller.dart'; // QnaController 추가
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -10,7 +9,6 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   final ProfileScreenController _controller = ProfileScreenController(); // 프로필 컨트롤러 인스턴스
-  final QnaController _qnaController = QnaController(); // Qna 컨트롤러 인스턴스
 
   String username = "회원님"; // 초기 사용자 이름
   String name = "회원"; // 초기 이름
@@ -23,7 +21,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.initState();
     fetchUserDetails(); // 사용자 정보 가져오기
     fetchUserOrders(); // 주문 내역 가져오기
-    fetchInquiryCount(); // 문의 개수 가져오기
   }
 
   Future<void> fetchUserDetails() async {
@@ -61,18 +58,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
 
-  Future<void> fetchInquiryCount() async {
-    try {
-      // QnA 문의 글 개수 가져오기
-      final qnaList = await _qnaController.getQnaInfo();
 
-      setState(() {
-        inquiryCount = qnaList.length; // 문의 글 개수 업데이트
-      });
-    } catch (e) {
-      print('문의 글 개수를 가져오는 중 오류 발생: $e');
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -135,6 +121,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               },
             ),
             Divider(color: Colors.grey[300], thickness: 1.0),
+
             ListTile(
               title: Text('개인정보 수정', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
               leading: Icon(Icons.person_outline, color: Colors.grey), // 개인정보 수정 아이콘

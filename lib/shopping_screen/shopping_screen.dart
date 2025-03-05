@@ -77,7 +77,7 @@ class _ShoppingScreenState extends State<ShoppingScreen> {
             crossAxisCount: 2,
             crossAxisSpacing: 16,
             mainAxisSpacing: 16,
-            childAspectRatio: 1,
+            childAspectRatio: 0.75,
           ),
           itemCount: filteredProducts.length,
           itemBuilder: (context, index) {
@@ -110,7 +110,7 @@ class _ShoppingScreenState extends State<ShoppingScreen> {
                           product['mainImageUrl'] ?? '',
                           fit: BoxFit.cover,
                           width: double.infinity,
-                          height: 200,
+                          height: 250,
                           errorBuilder: (context, error, stackTrace) {
                             return Center(child: Icon(Icons.error));
                           },
