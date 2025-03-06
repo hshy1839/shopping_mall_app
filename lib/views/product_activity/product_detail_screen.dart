@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../controllers/profile_screen_controller.dart';
 import '../../controllers/product_controller.dart';
 import '../main_activity/order_screen.dart';
+import 'dart:js' as js;
 
 class ProductDetailScreen extends StatelessWidget {
   final Map<String, dynamic> product;
@@ -19,12 +20,7 @@ class ProductDetailScreen extends StatelessWidget {
   }
 
   void _launchURL() async {
-    final Uri url = Uri.parse('https://open.kakao.com/o/sJTbQ2ag');
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url, mode: LaunchMode.externalApplication);
-    } else {
-      throw 'Could not launch $url';
-    }
+    js.context.callMethod('open', ['https://open.kakao.com/o/sJTbQ2ag']);
   }
   @override
   Widget build(BuildContext context) {
