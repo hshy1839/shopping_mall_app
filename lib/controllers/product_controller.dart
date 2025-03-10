@@ -39,11 +39,6 @@ class ProductController {
             final originalDate = item['createdAt']?.toString() ?? '';
             final formattedDate = _formatDate(originalDate);
 
-            // category 값을 main > sub 형식으로 변환
-            final category = item['category'] != null && item['category'] is Map<String, dynamic>
-                ? '${item['category']['main'] ?? ''} > ${item['category']['sub'] ?? ''}'
-                : '';
-
             // mainImage 값 처리
             final mainImageUrl = item['mainImage'] != null && item['mainImage'] is List<dynamic>
                 ? (item['mainImage'] as List<dynamic>).isNotEmpty
@@ -63,7 +58,7 @@ class ProductController {
               'id': productId,  // id 추가
               'name': item['name']?.toString() ?? '',
               'price': item['price']?.toString() ?? '',
-              'category': category,
+              'category': item['category']?.toString() ?? '',
               'mainImageUrl': mainImageUrl, // mainImageUrl 추가
               'description' : item['description']?.toString() ?? '',
               'additionalImageUrls': additionalImageUrls.join(','), // 추가 이미지들을 ','로 구분하여 저장
@@ -114,9 +109,6 @@ class ProductController {
           const serverUrl = 'http://3.36.74.8:8865';
 
           return data.map((item) {
-            final category = item['category'] != null && item['category'] is Map<String, dynamic>
-                ? '${item['category']['main'] ?? ''} > ${item['category']['sub'] ?? ''}'
-                : '';
 
             final additionalImageUrls = item['additionalImages'] != null && item['additionalImages'] is List<dynamic>
                 ? (item['additionalImages'] as List<dynamic>).map((image) => '$serverUrl$image').toList() // 서버 URL 추가
@@ -126,7 +118,7 @@ class ProductController {
               'id': item['_id']?.toString() ?? '',
               'name': item['name']?.toString() ?? '',
               'price': item['price']?.toString() ?? '',
-              'category': category,
+              'category': item['category']?.toString() ?? '',
               'mainImageUrl': serverUrl + (item['mainImage']?[0] ?? ''),
               'additionalImageUrls': additionalImageUrls.join(','), // 추가 이미지들을 ','로 구분하여 저장
               'description': item['description']?.toString() ?? '',

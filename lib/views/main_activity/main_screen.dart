@@ -24,12 +24,12 @@ class _MainScreenState extends State<MainScreen> {
   final List<Map<String, String>> categories = [
     {'name': '골프의류', 'icon': 'assets/icons/golf_cloth.png'},
     {'name': '일반의류', 'icon': 'assets/icons/cloth_man.png'},
-    {'name': '남성의류', 'icon': 'assets/icons/outer.png'},
-    {'name': '여성의류', 'icon': 'assets/icons/cloth_woman.png'},
+    {'name': '악세사리', 'icon': 'assets/icons/earrings.png'},
+    {'name': '모자', 'icon': 'assets/icons/cap.png'},
     {'name': '지갑', 'icon': 'assets/icons/wallet.png'},
     {'name': '가방', 'icon': 'assets/icons/bag.png'},
     {'name': '신발', 'icon': 'assets/icons/shoes.png'},
-    {'name': '기타', 'icon': 'assets/icons/cap.png'},
+    {'name': '기타', 'icon': 'assets/icons/etc.png'},
 
   ];
 
