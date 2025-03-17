@@ -180,6 +180,7 @@ class _MainScreenState extends State<MainScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // 📢 제목
                     Text(
                       '공지사항',
                       style: TextStyle(
@@ -188,13 +189,53 @@ class _MainScreenState extends State<MainScreen> {
                         color: Colors.black,
                       ),
                     ),
-                    SizedBox(height: 12),
+                    SizedBox(height: 18),
+                    Divider(
+                      color: Colors.grey[300], // 연한 회색 구분선
+                      thickness: 1.0, // 구분선 두께
+                    ),
+                    // 📢 공지사항 리스트 (최대 5개 표시)
                     if (notices.isNotEmpty)
-                      Text(
-                        notices[0]['title'] ?? '공지사항 제목',
-                        style: TextStyle(
-                          fontSize: 12.0,
-                          color: Colors.black,
+                      Column(
+                        children: List.generate(
+                          notices.length > 5 ? 5 : notices.length, // 최대 5개만 표시
+                              (index) => Column(
+                            children: [
+
+                              Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 1.0),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start, // 텍스트 정렬
+                                  children: [
+                                    Expanded( // ✅ 제목이 넘칠 경우 자동 줄바꿈
+                                      child: Text(
+                                        notices[index]['title'] ?? '공지사항 제목',
+                                        textAlign: TextAlign.left,
+                                        style: TextStyle(
+                                          fontSize: 16.0,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                    Text(
+                                        notices[index]['created_at'] ?? 'date', // ✅ 1부터 시작하는 번호 추가
+                                      style: TextStyle(
+                                        fontSize: 12.0,
+                                        color: Colors.grey[700],
+                                        fontWeight: FontWeight.bold, // 번호 강조
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              if (index < notices.length) // 마지막 항목에는 구분선 제거
+                                Divider(
+                                  color: Colors.grey[300], // 연한 회색 구분선
+                                  thickness: 1.0, // 구분선 두께
+                                ),
+                            ],
+                          ),
                         ),
                       )
                     else
@@ -205,7 +246,10 @@ class _MainScreenState extends State<MainScreen> {
                           color: Colors.black,
                         ),
                       ),
-                    SizedBox(height: 20),
+
+                    SizedBox(height: 0),
+
+                    // 🔍 '전체보기' 버튼
                     Align(
                       alignment: Alignment.bottomRight,
                       child: TextButton(
@@ -227,6 +271,8 @@ class _MainScreenState extends State<MainScreen> {
               ),
             ),
           ),
+
+
 
           // 카테고리
           SliverToBoxAdapter(
