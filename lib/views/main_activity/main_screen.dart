@@ -220,7 +220,7 @@ class _MainScreenState extends State<MainScreen> {
                                     Text(
                                         notices[index]['created_at'] ?? 'date', // ✅ 1부터 시작하는 번호 추가
                                       style: TextStyle(
-                                        fontSize: 12.0,
+                                        fontSize: 5.0,
                                         color: Colors.grey[700],
                                         fontWeight: FontWeight.bold, // 번호 강조
                                       ),

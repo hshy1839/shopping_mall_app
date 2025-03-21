@@ -45,7 +45,7 @@ class SignupController extends ChangeNotifier {
     }
 
     final response = await http.post(
-      Uri.parse('http://3.36.74.8:8865/api/users/signup'),
+      Uri.parse('http://15.164.155.205:8865/api/users/signup'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -108,7 +108,7 @@ class SignupController extends ChangeNotifier {
 
 
   Future<int> addOrUpdateShipping(String token, Map<String, dynamic> shippingAddress) async {
-    var url = Uri.parse('http://3.36.74.8:8865/api/shipping');
+    var url = Uri.parse('http://15.164.155.205:8865/api/shipping');
     try {
       var response = await http.post(
         url,

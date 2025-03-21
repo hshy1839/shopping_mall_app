@@ -24,7 +24,7 @@ class UserInfoScreenController {
 
       // 서버 요청
       final response = await http.get(
-        Uri.parse('http://3.36.74.8:8865/api/users/userinfoget'), // 서버 주소에 맞게 수정
+        Uri.parse('http://15.164.155.205:8865/api/users/userinfoget'), // 서버 주소에 맞게 수정
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token', // SharedPreferences에서 가져온 토큰 사용
@@ -63,7 +63,7 @@ class UserInfoScreenController {
       }
 
       final response = await http.get(
-        Uri.parse('http://3.36.74.8:8865/api/shippinginfo'),  // :id는 적절한 사용자 ID로 대체해야 합니다.
+        Uri.parse('http://15.164.155.205:8865/api/shippinginfo'),  // :id는 적절한 사용자 ID로 대체해야 합니다.
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -102,7 +102,7 @@ class UserInfoScreenController {
 
       // 서버 요청
       final response = await http.put(
-        Uri.parse('http://3.36.74.8:8865/api/shipping/update'), // 서버 주소에 맞게 수정
+        Uri.parse('http://15.164.155.205:8865/api/shipping/update'), // 서버 주소에 맞게 수정
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token', // SharedPreferences에서 가져온 토큰 사용
@@ -148,7 +148,7 @@ class UserInfoScreenController {
 
       // 서버 요청
       final response = await http.put(
-        Uri.parse('http://3.36.74.8:8865/api/users/userinfoUpdate'), // 서버 주소에 맞게 수정
+        Uri.parse('http://15.164.155.205:8865/api/users/userinfoUpdate'), // 서버 주소에 맞게 수정
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token', // SharedPreferences에서 가져온 토큰 사용
