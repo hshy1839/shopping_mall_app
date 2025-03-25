@@ -31,6 +31,7 @@ class _ShoppingScreenState extends State<ShoppingScreen> {
         category: widget.category,
       );
 
+
       setState(() {
         filteredProducts = fetchedProducts;
         isLoading = false;

@@ -92,7 +92,7 @@ class ProductController {
 
       // 쿼리 파라미터 설정
       final url = Uri.parse(
-          'http://15.164.155.205:8865/api/products/allProduct/category?category=$category');
+          'http://localhost:8865/api/products/allProduct/category?category=$category');
 
       final response = await http.get(
         url,

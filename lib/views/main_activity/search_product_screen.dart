@@ -32,7 +32,8 @@ class _SearchProductScreenState extends State<SearchProductScreen> {
         filteredProducts = products.where((product) {
           final name = product['name']?.toLowerCase() ?? '';
           final category = product['category']?.toLowerCase() ?? '';
-          return name.contains(widget.searchQuery.toLowerCase()) || category.contains(widget.searchQuery.toLowerCase());
+          final description = product['description']?.toLowerCase() ?? '';
+          return name.contains(widget.searchQuery.toLowerCase()) || description.contains(widget.searchQuery.toLowerCase()) ||category.contains(widget.searchQuery.toLowerCase());
         }).toList();
       });
     } catch (e) {
